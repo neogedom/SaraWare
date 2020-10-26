@@ -1,0 +1,62 @@
+@CHARSET "UTF-8";
+
+.ui-layout-north {
+	z-index: 20 !important;
+	overflow: visible !important;;
+}
+
+.ui-layout-north .ui-layout-unit-content {
+	overflow: visible !important;
+}
+
+.txtPagInicial {
+	font-size: 40px !important;
+	font-style: italic;
+	font-family: sans-serif;
+	font-weight: bolder;
+}
+
+.ui-widget, .ui-widget .ui-widget {
+	font-size: 12px !important;
+}
+
+.afastadoComponente {
+	display: block;
+	margin-top: 30px;
+	margin-left: 10%;
+
+}
+
+.afastadoComponente2 {
+	display: block;
+	margin-left: 20%;
+	margin-right: 50%;
+}
+
+
+.wizard {
+	display: block;
+	margin-left: 40%;
+}
+
+
+.centralizado {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: auto;
+	margin-top: auto;
+}
+
+#schedule .fc-event-time{
+	display: none;
+}
+
+body {
+	background-color: #FFFFFF;
+}
+
+html {
+	overflow-y: hidden;
+}
+

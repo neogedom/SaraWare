@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/modeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmEncontristaReincidenteListagem">
+			<p:dataTable id="tblEncontristaReincidente"
+				widgetVar="tabelaEncontristaReincidente"
+				emptyMessage="Nenhum registro encontrado."
+				value="#{MBEncontristaReincidente.itens}" var="item"
+				filteredValue="#{MBEncontristaReincidente.itensFiltrados}"
+				paginator="true" rows="10">
+
+				<f:facet name="header">
+					Pré Inscrição de Encontristas Reincidentes - Listagem
+				</f:facet>
+
+
+				<p:column headerText="Nome" sortBy="#{item.nome}"
+					filterBy="#{item.nome}" filterMatchMode="contains">
+					<h:outputText value="#{item.nome}" />
+				</p:column>
+
+
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-plusthick"
+						oncomplete="PF('dlgEncontristaReincidenteDetalhes').show();"
+						update=":frmEncontristaReincidenteDetalhes:pnlEncontristaReincidenteDetalhes"
+						alt="Mais Detalhes">
+						<f:setPropertyActionListener
+							target="#{MBEncontristaReincidente.pessoa}" value="#{item}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-trash"
+						oncomplete="PF('dlgEncontristaReincidenteExcluir').show();"
+						update=":frmEncontristaReincidenteExcluir:pnlEncontristaReincidenteExcluir"
+						alt="Excluir">
+						<f:setPropertyActionListener
+							target="#{MBEncontristaReincidente.pessoa}" value="#{item}" />
+					</p:commandButton>
+
+				</p:column>
+
+				<f:facet name="footer">
+					<p:commandButton value="Novo"
+						actionListener="#{MBEncontristaReincidente.prepararNovo}"
+						oncomplete="PF('dlgEncontristaReincidenteNovo').show();"
+						update=":frmEncontristaReincidenteNovo:pnlEncontristaReincidenteNovo :msgGlobal" />
+				</f:facet>
+
+			</p:dataTable>
+		</h:form>
+
+		<p:dialog widgetVar="dlgEncontristaReincidenteNovo" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="EncontristaReincidente - Novo">
+			<h:form id="frmEncontristaReincidenteNovo">
+
+				
+				<h:panelGrid id="pnlEncontristaReincidenteNovo" columns="2">
+					
+					<p:selectOneRadio layout="grid" columns="2" required="true" value="#{MBEncontristaReincidente.radioValue}"
+						requiredMessage="É obrigatório escolher entre Membro ou Não Membro.">
+						<p:ajax update="label :frmEncontristaReincidenteNovo:cmbOpcaoEncontristaReincidenteNovo" listener="#{MBEncontristaReincidente.mudaListagem}"/>
+						<f:selectItem 
+							itemLabel="Membro"
+							itemValue="um membro" />
+							
+						<f:selectItem 
+							itemLabel="Não Membro"
+							itemValue="uma pessoa" />
+					</p:selectOneRadio>
+					<p:separator />
+					<p:outputLabel id="label"
+						value="Selecione #{MBEncontristaReincidente.comboLabel}:"
+						for="cmbOpcaoEncontristaReincidenteNovo" />
+					<p:separator />
+					<p:selectOneMenu
+						value="#{MBEncontristaReincidente.encontristaObject.codigoPessoa}"
+						filter="true" id="cmbOpcaoEncontristaReincidenteNovo"
+						required="true" requiredMessage="O campo de seleção de membro/pessoa é obrigatório.">
+						<f:selectItem itemValue="" itemLabel="Selecione um membro/pessoa..." />
+						<f:selectItems value="#{MBEncontristaReincidente.comboPessoas}" var="item" 
+									itemValue="#{item.codigoPessoa}" itemLabel="#{item.nome}"/>
+					</p:selectOneMenu>
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Salvar"
+						actionListener="#{MBEncontristaReincidente.novo}"
+						oncomplete="verificar(xhr, status, args, 'dlgEncontristaReincidenteNovo', 'tabelaEncontristaReincidente');"
+						update=":frmEncontristaReincidenteListagem:tblEncontristaReincidente :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgEncontristaReincidenteNovo').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgEncontristaReincidenteExcluir" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="EncontristaReincidente - Excluir">
+			<h:form id="frmEncontristaReincidenteExcluir">
+				<h:panelGrid id="pnlEncontristaReincidenteExcluir" columns="2">
+					<h:outputText value="Nome:" />
+					<h:outputText
+						value="#{MBEncontristaReincidente.pessoa.nome}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBEncontristaReincidente.excluir}"
+						oncomplete="PF('dlgEncontristaReincidenteExcluir').hide(); tabelaEncontristaReincidente.clearFilters();"
+						update=":frmEncontristaReincidenteListagem:tblEncontristaReincidente :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgEncontristaReincidenteExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgEncontristaReincidenteDetalhes"
+			closable="true" draggable="true" resizable="false" modal="true"
+			appendTo="@(body)" header="EncontristaReincidente - Detalhes">
+			<h:form id="frmEncontristaReincidenteDetalhes">
+				<h:panelGrid id="pnlEncontristaReincidenteDetalhes" columns="2">
+					
+					<h:outputLabel value="Nome:" />
+					<h:outputText
+						value="#{MBEncontristaReincidente.pessoa.nome}" />
+
+					<h:outputLabel value="Endereço:" />
+					<h:outputText
+						value="#{MBEncontristaReincidente.pessoa.endereco}" />
+
+					<h:outputLabel value="Telefone:" />
+					<h:outputText
+						value="#{MBEncontristaReincidente.pessoa.telefone}" />
+
+					<h:outputLabel value="Nascimento:" />
+					<h:outputText
+						value="#{MBEncontristaReincidente.pessoa.dataNascimento}" />
+
+					<h:outputLabel value="Nº Documento:" />
+					<h:outputText
+						value="#{MBEncontristaReincidente.pessoa.numeroDocumento}" />
+
+					<h:outputLabel value="Documento:" />
+					<h:outputText
+						value="#{MBEncontristaReincidente.pessoa.tipoDocumento}" />
+
+					<h:outputLabel value="Sexo:" />
+					<h:outputText
+						value="#{MBEncontristaReincidente.pessoa.sexo}" />
+
+					<h:outputLabel value="Estado Civil:" />
+					<h:outputText
+						value="#{MBEncontristaReincidente.pessoa.estadoCivil}" />
+
+				</h:panelGrid>
+
+			</h:form>
+		</p:dialog>
+	</ui:define>
+
+</ui:composition>

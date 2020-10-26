@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/modeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmCompraListagem">
+			<p:dataTable id="tblCompra" widgetVar="tabelaCompra"
+				emptyMessage="Nenhum registro encontrado." value="#{MBCompra.itens}"
+				var="item" filteredValue="#{MBCompra.itensFiltrados}"
+				paginator="true" rows="10">
+
+				<f:facet name="header">
+					Compra - Listagem
+				</f:facet>
+
+				<p:column headerText="Código" sortBy="#{item.codigoCompra}"
+					filterBy="#{item.codigoCompra}" filterMatchMode="contains">
+					<h:outputText value="#{item.codigoCompra}" />
+				</p:column>
+				<p:column headerText="Data" sortBy="#{item.data}"
+					filterBy="#{item.data}" filterMatchMode="contains">
+					<h:outputText value="#{item.data}" />
+				</p:column>
+
+				<p:column headerText="Valor" sortBy="#{item.valor}"
+					filterBy="#{item.valor}" filterMatchMode="contains">
+					<h:outputText value="#{item.valor}" />
+				</p:column>
+
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-plusthick"
+						oncomplete="PF('dlgCompraDetalhes').show();"
+						update=":frmCompraDetalhes:pnlCompraDetalhes" alt="Mais Detalhes"
+						actionListener="#{MBCompra.prepararDetalhes(item)}">
+						<f:setPropertyActionListener target="#{MBCompra.compra}"
+							value="#{item}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-trash"
+						oncomplete="PF('dlgCompraExcluir').show();"
+						update=":frmCompraExcluir:pnlCompraExcluir">
+						<f:setPropertyActionListener target="#{MBCompra.compra}"
+							value="#{item}" />
+					</p:commandButton>
+
+
+
+				</p:column>
+
+				<f:facet name="footer">
+					<p:commandButton value="Nova Compra"
+						actionListener="#{MBCompra.prepararNovo}"
+						oncomplete="PF('dlgCompraNovo').show();"
+						update=":frmCompraNovo:pnlCompraNovo :msgGlobal" />
+				</f:facet>
+
+			</p:dataTable>
+		</h:form>
+
+		<p:dialog widgetVar="dlgCompraNovo" closable="true" draggable="true"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Compra - Novo">
+			<h:form id="frmCompraNovo">
+				<h:panelGrid id="pnlCompraNovo" columns="2">
+					<p:outputLabel value="Valor:" for="txtValorCompraNovo" />
+					<p:outputLabel value="#{MBCompra.valorCompra}" id="txtValorCompraNovo" />
+
+
+					<p:dataTable id="tblItemCompra" widgetVar="tabelaItemCompra"
+						emptyMessage="Nenhum registro encontrado."
+						value="#{MBCompra.itensCompra}" var="item"
+						filteredValue="#{MBCompra.itensCompraFiltrados}" paginator="true"
+						rows="10">
+
+						<f:facet name="header">
+							Item de Compra - Listagem
+						</f:facet>
+
+						<p:column headerText="Código" sortBy="#{item.codigoItemCompra}"
+							filterBy="#{item.codigoItemCompra}" filterMatchMode="contains">
+							<h:outputText value="#{item.codigoItemCompra}" />
+						</p:column>
+						
+						<p:column headerText="Descrição" sortBy="#{item.descricao}"
+							filterBy="#{item.descricao}" filterMatchMode="contains">
+							<h:outputText value="#{item.descricao}" />
+						</p:column>
+
+						<p:column headerText="Valor Unitário"
+							sortBy="#{item.valorUnitario}" filterBy="#{item.valorUnitario}"
+							filterMatchMode="contains">
+							<h:outputText value="#{item.valorUnitario}" />
+						</p:column>
+
+						<p:column headerText="Quantidade" sortBy="#{item.quantidade}"
+							filterBy="#{item.quantidade}" filterMatchMode="contains">
+							<h:outputText value="#{item.quantidade}" />
+						</p:column>
+
+					</p:dataTable>
+				</h:panelGrid>
+
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Salvar" actionListener="#{MBCompra.novo}"
+						oncomplete="verificar(xhr, status, args, 'dlgCompraNovo', 'tabelaCompra');"
+						update=":frmCompraListagem:tblCompra :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgCompraNovo').hide();" />
+				</h:panelGrid>
+			</h:form>
+
+			<h:form>
+				<p:commandButton value="Novo Item de Compra"
+					actionListener="#{MBCompra.prepararNovoItemCompra}"
+					oncomplete="PF('dlgItemCompraNovo').show();"
+					update=":frmItemCompraNovo:pnlItemCompraNovo :msgGlobal" />
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgItemCompraNovo" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Item de Compra - Novo">
+			<h:form id="frmItemCompraNovo">
+
+				<h:panelGrid id="pnlItemCompraNovo" columns="2">
+
+					<p:outputLabel value="Item:" for="cmbDescItemCompraNovo" />
+					
+					<p:selectOneMenu value="#{MBCompra.itemCompra.descricao}"
+						filter="true" id="cmbDescItemCompraNovo" required="true"
+						requiredMessage="O campo descrição é obrigatório.">
+						<f:selectItem itemValue="" itemLabel="Selecione um item..." />
+						<f:selectItems value="#{MBCompra.comboItems}" var="item"
+							itemValue="#{item.descricao}" itemLabel="#{item.descricao}" />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Valor Unitário:"
+						for="txtValorUnitarioItemCompraNovo" />
+					<p:inputText size="8" maxlength="8"
+						value="#{MBCompra.itemCompra.valorUnitario}"
+						id="txtValorUnitarioItemCompraNovo" required="true"
+						requiredMessage="O campo valor unitário é obrigatório.">
+						
+						
+						</p:inputText>
+
+					<p:outputLabel value="Quantidade:"
+						for="txtQuantidadeItemCompraNovo" />
+					<p:inputText size="5" maxlength="5"
+						value="#{MBCompra.itemCompra.quantidade}"
+						id="txtQuantidadeItemCompraNovo" required="true"
+						requiredMessage="O campo valor unitário é obrigatório.">
+						
+						<f:convertNumber maxIntegerDigits="4" />
+						
+					</p:inputText>
+
+				</h:panelGrid>
+
+				<p:commandButton value="Salvar"
+					actionListener="#{MBCompra.novoItemCompra}"
+					oncomplete="verificar(xhr, status, args, 'dlgItemCompraNovo', 'tabelaItemCompra');"
+					update=":frmCompraNovo:tblItemCompra :msgGlobal" />
+				<p:commandButton value="Cancelar"
+					onclick="PF('dlgItemCompraNovo').hide();" />
+
+			</h:form>
+				
+			<h:form>
+				<p:commandButton value="Novo Item"
+					actionListener="#{MBCompra.prepararNovoItem}"
+					oncomplete="PF('dlgItemNovo').show();"
+					update=":frmItemNovo:pnlItemNovo :msgGlobal" />
+			</h:form>
+		</p:dialog>
+		
+		
+		<p:dialog widgetVar="dlgItemNovo" closable="true"
+			dynamic="false" draggable="true" resizable="false" modal="true"
+			appendTo="@(body)" header="Item - Novo">
+			<h:form id="frmItemNovo">
+				<h:panelGrid id="pnlItemNovo" columns="2">
+					<p:outputLabel value="Descrição" for="txtDescItemNovo" />
+					<p:inputText id="txtDescItemNovo" size="30" maxlength="250"
+						value="#{MBMeta.itemDoacaoMeta.descricao}" required="true"
+						requiredMessage="O campo descrição é obrigatório."
+						validatorMessage="Este campo aceita apenas letras e espaços.">
+						<f:validateRegex pattern="[a-zA-ZzáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]*" />
+					</p:inputText>
+
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Salvar"
+						actionListener="#{MBMeta.novoItemDoacao}"
+						oncomplete="verificar(xhr, status, args, 'dlgItemDoacaoNovo', 'tabelaItemsDoacaoMeta');"
+						update=":msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgItemDoacaoNovo').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgCompraExcluir" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Compra - Excluir">
+			<h:form id="frmCompraExcluir">
+				<h:panelGrid id="pnlCompraExcluir" columns="2">
+					<h:outputText value="Código:" />
+					<h:outputText value="#{MBCompra.compra.codigoCompra}" />
+					<h:outputText value="Descrição:" />
+					<h:outputText value="#{MBCompra.compra.data}" />
+					<h:outputText value="Valor:" />
+					<h:outputText value="#{MBCompra.compra.valor}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBCompra.excluir}"
+						oncomplete="PF('dlgCompraExcluir').hide(); tabelaCompra.clearFilters();"
+						update=":frmCompraListagem:tblCompra :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgCompraExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgCompraDetalhes" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Célula - Detalhes">
+			<h:form id="frmCompraDetalhes">
+				<h:panelGrid id="pnlCompraDetalhes">
+					<h:panelGrid columns="2">
+						<h:outputLabel value="Código:" />
+						<h:outputText value="#{MBCompra.compra.codigoCompra}" />
+
+					</h:panelGrid>
+					<h:panelGrid width="100%">
+						<p:dataList value="#{MBCompra.itensCompra}" paginator="true"
+							var="membro" type="ordered"
+							emptyMessage="Nenhum registro encontrado.">
+							<f:facet name="header">
+								Itens da Compra
+							</f:facet>
+
+							<p:column>
+								<p:outputLabel value="#{membro.descricao}" />
+							</p:column>
+							
+							<p:column>
+								<p:outputLabel value="#{membro.valor}" />
+							</p:column>
+
+						</p:dataList>
+					</h:panelGrid>
+				</h:panelGrid>
+
+			</h:form>
+		</p:dialog>
+	</ui:define>
+
+</ui:composition>

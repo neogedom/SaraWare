@@ -1,0 +1,1178 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/modeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml" />
+
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmWizard">
+			<h:panelGrid>
+				<p:wizard flowListener="#{MBRevisao.onFlowProcess}">
+					<p:tab title="Escolha uma data">
+
+						<p:outputLabel value="Selecione uma data planejada:" />
+						<p:selectOneRadio layout="grid" columns="2" required="true"
+							value="#{MBRevisao.dataRevisao}"
+							requiredMessage="É obrigatório selecionar uma data planejada.">
+							<f:selectItem
+								itemDisabled="#{MBPlanejamento.planejamentoTela.revisao1.dataVencida}"
+								itemLabel="#{MBPlanejamento.planejamentoTela.revisao1.dataFormatada}"
+								itemValue="#{MBPlanejamento.planejamentoTela.revisao1.dataDeAcontecimento}" />
+							<f:selectItem
+								itemDisabled="#{MBPlanejamento.planejamentoTela.revisao2.dataVencida}"
+								itemLabel="#{MBPlanejamento.planejamentoTela.revisao2.dataFormatada}"
+								itemValue="#{MBPlanejamento.planejamentoTela.revisao2.dataDeAcontecimento}" />
+							<f:selectItem
+								itemDisabled="#{MBPlanejamento.planejamentoTela.revisao3.dataVencida}"
+								itemLabel="#{MBPlanejamento.planejamentoTela.revisao3.dataFormatada}"
+								itemValue="#{MBPlanejamento.planejamentoTela.revisao3.dataDeAcontecimento}" />
+							<f:selectItem
+								itemDisabled="#{MBPlanejamento.planejamentoTela.revisao4.dataVencida}"
+								itemLabel="#{MBPlanejamento.planejamentoTela.revisao4.dataFormatada}"
+								itemValue="#{MBPlanejamento.planejamentoTela.revisao4.dataDeAcontecimento}" />
+						</p:selectOneRadio>
+
+					</p:tab>
+
+					<p:tab title="Cadastre encontreiros">
+						<p:outputLabel value="Valor da inscrição: " />
+						<p:spinner size="8" maxlength="5" required="true" min="0" prefix="R$ " stepFactor="0.05"
+							requiredMessage="O campo valor da inscrição é obrigatório"
+							value="#{MBRevisao.inscricaoEncontreiro}" />
+
+
+						<h:panelGrid columns="2">
+							<p:dataTable value="#{MBRevisao.membros}" id="tblMembros"
+								emptyMessage="Nenhum registro encontrado." var="item"
+								paginator="true" rows="10">
+
+								<f:facet name="header">
+											Membros
+										</f:facet>
+
+								<p:column headerText="Nome" SortBy="#{item.nome}"
+									filterBy="#{item.nome}" filterMatchMode="contains">
+									<h:outputText value="#{item.nome}" />
+								</p:column>
+
+								<p:column headerText="Adicionar a Encontreiros">
+									<p:commandButton icon="ui-icon-circle-plus"
+										action="#{MBRevisao.addMembros(item)}"
+										update=":frmWizard:tblEncontreiros :msgGlobal" />
+								</p:column>
+
+							</p:dataTable>
+
+
+							<p:dataTable id="tblEncontreiros" widgetVar="tabelaEncontreiros"
+								emptyMessage="Nenhum encontreiro adicionado." paginator="true"
+								rows="5" value="#{MBRevisao.membrosEncontreiros}" var="item">
+
+								<f:facet name="header">
+											Encontreiros
+										</f:facet>
+
+								<p:column headerText="Nome" SortBy="#{item.nome}">
+									<h:outputText value="#{item.nome}" />
+								</p:column>
+
+								<p:column headerText="Remover">
+									<p:commandButton icon="ui-icon-circle-minus"
+										action="#{MBRevisao.excluirEncontreiro(item)}"
+										update=":frmWizard:tblEncontreiros :msgGlobal" />
+								</p:column>
+
+							</p:dataTable>
+
+
+						</h:panelGrid>
+					</p:tab>
+
+					<p:tab title="Inscreva encontristas">
+						<p:outputLabel value="Valor da inscrição: " />
+						<p:spinner size="8" maxlength="5" required="true" min="0" prefix="R$ " stepFactor="0.05"
+							requiredMessage="O campo valor da inscrição é obrigatório"
+							value="#{MBRevisao.inscricaoEncontrista}" />
+						<p:panelGrid columns="2">
+							<p:dataTable id="tblEncontristas" widgetVar="tabelaEncontristas"
+								emptyMessage="Nenhum encontrista adicionado." paginator="true"
+								rows="5" value="#{MBRevisao.encontristas}" var="item">
+
+								<f:facet name="header">
+											Encontristas
+										</f:facet>
+
+								<p:column headerText="Nome" SortBy="#{item.nome}">
+									<h:outputText value="#{item.nome}" />
+								</p:column>
+
+								<p:column headerText="Remover">
+									<p:commandButton icon="ui-icon-circle-minus"
+										action="#{MBRevisao.excluirEncontrista(item)}"
+										update=":frmWizard:tblEncontristas :msgGlobal" />
+								</p:column>
+
+							</p:dataTable>
+
+							<p:dataTable id="tblEncontristasReincidentes"
+								widgetVar="tabelaEncontristasReincidentes"
+								emptyMessage="Nenhum encontrista adicionado." paginator="true"
+								rows="5" value="#{MBRevisao.encontristasReincidentes}"
+								var="item">
+
+								<f:facet name="header">
+											Encontristas Reincidentes
+										</f:facet>
+
+								<p:column headerText="Nome" SortBy="#{item.nome}">
+									<h:outputText value="#{item.nome}" />
+								</p:column>
+
+								<p:column headerText="Remover">
+									<p:commandButton icon="ui-icon-circle-minus"
+										action="#{MBRevisao.excluirEncontrista(item)}"
+										update=":frmWizard:tblEncontristasReincidentes :msgGlobal" />
+								</p:column>
+
+
+							</p:dataTable>
+						</p:panelGrid>
+					</p:tab>
+
+					<p:tab title="Grupos de trabalho">
+
+						<p:dataTable id="tblGruposDeTrabalho"
+							widgetVar="tabelaGruposDeTrabalho"
+							emptyMessage="Nenhum grupo de trabalho adicionado adicionado."
+							paginator="true" rows="5" value="#{MBRevisao.gruposTrabalho}"
+							var="item">
+
+							<f:facet name="header">
+											Grupos de Trabalho
+										</f:facet>
+
+							<p:column headerText="Nome" filterBy="#{item.descricao}"
+								SortBy="#{item.descricao}">
+								<h:outputText value="#{item.descricao}" />
+							</p:column>
+
+							<p:column headerText="Coordenador"
+								filterBy="#{item.coordenador.nome}"
+								SortBy="#{item.coordenador.nome}">
+								<h:outputText value="#{item.coordenador.nome}" />
+							</p:column>
+
+							<p:column headerText="Opções">
+
+								<p:commandButton icon="ui-icon-plusthick"
+									oncomplete="PF('dlgGrupoTrabalhoDetalhes').show();"
+									update=":frmGrupoTrabalhoDetalhes:pnlGrupoTrabalhoDetalhes"
+									alt="Mais Detalhes"
+									actionListener="#{MBRevisao.prepararDetalhesGrupoTrabalho(item)}">
+									<f:setPropertyActionListener
+										target="#{MBRevisao.grupoTrabalho}" value="#{item}" />
+								</p:commandButton>
+
+								<p:commandButton icon="ui-icon-trash"
+									oncomplete="PF('dlgGrupoTrabalhoExcluir').show();"
+									update=":frmGrupoTrabalhoExcluir:pnlGrupoTrabalhoExcluir">
+									<f:setPropertyActionListener
+										target="#{MBRevisao.grupoTrabalho}" value="#{item}" />
+								</p:commandButton>
+
+
+								<p:commandButton icon="ui-icon-pencil"
+									oncomplete="PF('dlgGrupoTrabalhoEditar').show();"
+									update=":frmGrupoTrabalhoEditar:pnlGrupoTrabalhoEditar"
+									actionListener="#{MBRevisao.prepararEditarGrupoTrabalho(item.codigoGrupoTabalho)}">
+									<f:setPropertyActionListener
+										target="#{MBRevisao.grupoTrabalho}" value="#{item}" />
+								</p:commandButton>
+
+							</p:column>
+
+							<f:facet name="footer">
+								<p:commandButton value="Novo"
+									actionListener="#{MBRevisao.prepararNovoGrupoTrabalho}"
+									oncomplete="PF('dlgGrupoTrabalhoNovo').show();"
+									update=":frmGrupoTrabalhoNovo:pnlGrupoTrabalhoNovo :msgGlobal" />
+							</f:facet>
+
+						</p:dataTable>
+
+					</p:tab>
+
+
+					<p:tab title="Distribua ministrações">
+						<p:dataTable id="tblMinistracao" widgetVar="tabelaMinistracao"
+							emptyMessage="Nenhum registro encontrado."
+							value="#{MBRevisao.ministracoes}" var="item"
+							filteredValue="#{MBRevisao.ministracoesFiltradas}"
+							paginator="true" rows="10">
+
+							<f:facet name="header">
+								Ministrações - Listagem
+							</f:facet>
+
+							<p:column headerText="Código" sortBy="#{item.codigoMinistracao}"
+								filterBy="#{item.codigoMinistracao}" filterMatchMode="contains">
+								<h:outputText value="#{item.codigoMinistracao}" />
+							</p:column>
+							<p:column headerText="Título" sortBy="#{item.titulo}"
+								filterBy="#{item.titulo}" filterMatchMode="contains">
+								<h:outputText value="#{item.titulo}" />
+							</p:column>
+
+							<p:column headerText="Ministrante"
+								sortBy="#{item.ministrante.nome}"
+								filterBy="#{item.ministrante.nome}" filterMatchMode="contains">
+								<h:outputText value="#{item.ministrante.nome}" />
+							</p:column>
+
+							<p:column headerText="Tempo" sortBy="#{item.ministrante.minutos}"
+								filterBy="#{item.ministrante.minutos}"
+								filterMatchMode="contains">
+								<h:outputText value="#{item.minutos} minutos" />
+							</p:column>
+
+							<p:column headerText="Opções">
+
+								<p:commandButton icon="ui-icon-trash"
+									oncomplete="PF('dlgMinistracaoExcluir').show();"
+									update=":frmMinistracaoExcluir:pnlMinistracaoExcluir">
+									<f:setPropertyActionListener target="#{MBRevisao.ministracao}"
+										value="#{item}" />
+								</p:commandButton>
+
+
+								<p:commandButton icon="ui-icon-pencil"
+									oncomplete="PF('dlgMinistracaoEditar').show();"
+									update=":frmMinistracaoEditar:pnlMinistracaoEditar"
+									actionListener="#{MBRevisao.prepararEditarMinistracao}">
+									<f:setPropertyActionListener target="#{MBRevisao.ministracao}"
+										value="#{item}" />
+								</p:commandButton>
+							</p:column>
+
+							<f:facet name="footer">
+								<p:commandButton value="Novo"
+									actionListener="#{MBRevisao.prepararNovoMinistracao}"
+									oncomplete="PF('dlgMinistracaoNovo').show();"
+									update=":frmMinistracaoNovo:pnlMinistracaoNovo :msgGlobal" />
+							</f:facet>
+
+						</p:dataTable>
+					</p:tab>
+
+					<p:tab title="Cadastrar Revisão">
+						<p:commandButton value="Cadastrar Revisão"
+							actionListener="#{MBRevisao.novoRevisao}" update=":msgGlobal" />
+
+					</p:tab>
+
+					<p:tab title="Cronograma">
+
+						<p:dataTable id="tblCronograma" widgetVar="tabelaCronograma"
+							emptyMessage="Nenhum item de cronograma adicionado."
+							paginator="true" rows="5" value="#{MBRevisao.itemsCronogramas}"
+							var="item">
+
+							<f:facet name="header">
+											Cronograma
+										</f:facet>
+							<p:column headerText="Dia" sortBy="#{item.dia}">
+								<h:outputText value="#{item.dia}" />
+							</p:column>
+
+							<p:column headerText="Início" sortBy="#{item.horaInicio}"
+								filterBy="#{item.horaInicio}">
+								<h:outputText value="#{item.horaInicio}">
+									<f:convertDateTime pattern="HH:mm" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="Fim" filterBy="#{item.horaFim}">
+								<h:outputText value="#{item.horaFim}">
+									<f:convertDateTime pattern="HH:mm" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="Tipo" filterBy="#{item.descricao}">
+								<h:outputText value="#{item.descricao}" />
+							</p:column>
+
+							<p:column headerText="Título"
+								filterBy="#{item.ministracao.titulo}">
+								<h:outputText value="#{item.ministracao.titulo}" />
+							</p:column>
+
+							<p:column headerText="Descrição do Intervalo"
+								filterBy="#{item.intervalo.descricaoIntervalo}">
+								<h:outputText value="#{item.intervalo.descricaoIntervalo}" />
+							</p:column>
+
+
+							<p:column headerText="Opções">
+
+								<p:commandButton icon="ui-icon-trash"
+									oncomplete="PF('dlgItemCronogramaExcluir').show();"
+									update=":frmItemCronogramaExcluir:pnlItemCronogramaExcluir">
+									<f:setPropertyActionListener
+										target="#{MBRevisao.itemCronograma}" value="#{item}" />
+								</p:commandButton>
+
+							</p:column>
+
+							<f:facet name="footer">
+								<p:commandButton value="Novo"
+									actionListener="#{MBRevisao.prepararNovoItemCronograma}"
+									oncomplete="PF('dlgItemCronogramaNovo').show();"
+									update=":frmItemCronogramaNovo:pnlItemCronogramaNovo :msgGlobal" />
+
+								<p:commandButton value="Imprimir Cronograma"
+									actionListener="#{MBRevisao.imprimir}" />
+							</f:facet>
+
+						</p:dataTable>
+
+					</p:tab>
+
+					<p:tab title="Escala">
+
+						<p:dataTable id="tblEscala" widgetVar="tabelaEscala"
+							emptyMessage="Nenhuma tarefa adicionada." paginator="true"
+							rows="5" value="#{MBRevisao.tarefas}" var="item">
+
+							<f:facet name="header">
+											Escala
+										</f:facet>
+
+							<p:column headerText="Dia" sortBy="#{item.itemCronograma.dia}">
+								<h:outputText value="#{item.itemCronograma.dia}" />
+							</p:column>
+
+							<p:column headerText="Início"
+								sortBy="#{item.itemCronograma.horaInicio}"
+								filterBy="#{item.itemCronograma.horaInicio}">
+								<h:outputText value="#{item.itemCronograma.horaInicio}">
+									<f:convertDateTime pattern="HH:mm" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="Fim"
+								filterBy="#{item.itemCronograma.horaFim}">
+								<h:outputText value="#{item.itemCronograma.horaFim}">
+									<f:convertDateTime pattern="HH:mm" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="Durante a ministração"
+								filterBy="#{item.itemCronograma.ministracao.titulo}">
+								<h:outputText value="#{item.itemCronograma.ministracao.titulo}" />
+							</p:column>
+
+							<p:column headerText="Tarefa" filterBy="#{item.descricaoTarefa}">
+								<h:outputText value="#{item.descricaoTarefa}" />
+							</p:column>
+
+
+							<p:column headerText="Opções">
+
+								<p:commandButton icon="ui-icon-plusthick"
+									oncomplete="PF('dlgEscalaDetalhes').show();"
+									update=":frmEscalaDetalhes:pnlEscalaDetalhes"
+									alt="Mais Detalhes"
+									actionListener="#{MBRevisao.prepararDetalhesEscala(item)}">
+									<f:setPropertyActionListener target="#{MBRevisao.tarefa}"
+										value="#{item}" />
+								</p:commandButton>
+
+								<p:commandButton icon="ui-icon-trash"
+									oncomplete="PF('dlgEscalaExcluir').show();"
+									update=":frmEscalaExcluir:pnlEscalaExcluir">
+									<f:setPropertyActionListener target="#{MBRevisao.tarefa}"
+										value="#{item}" />
+								</p:commandButton>
+
+								<p:commandButton icon="ui-icon-pencil"
+									oncomplete="PF('dlgEscalaEditar').show();"
+									update=":frmEscalaEditar:pnlEscalaEditar"
+									actionListener="#{MBRevisao.prepararEditarEscala(item.codigoTarefa)}">
+									<f:setPropertyActionListener target="#{MBRevisao.tarefa}"
+										value="#{item}" />
+								</p:commandButton>
+
+							</p:column>
+
+							<f:facet name="footer">
+								<p:commandButton value="Novo"
+									actionListener="#{MBRevisao.prepararNovoEscala}"
+									oncomplete="PF('dlgEscalaNovo').show();"
+									update=":frmEscalaNovo:pnlEscalaNovo :msgGlobal" />
+									
+									<p:commandButton value="Imprimir Escala"
+									actionListener="#{MBRevisao.imprimirEscala}" />
+							</f:facet>
+
+						</p:dataTable>
+					</p:tab>
+
+				</p:wizard>
+			</h:panelGrid>
+		</h:form>
+
+		<p:dialog widgetVar="dlgGrupoTrabalhoNovo" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Grupo de Trabalho - Novo">
+			<h:form id="frmGrupoTrabalhoNovo">
+				<h:panelGrid id="pnlGrupoTrabalhoNovo" columns="2">
+					
+					<p:outputLabel value="Coordenador:"
+						for="cmbCoordenadorGrupoTrabalhoNovo" />
+					<p:selectOneMenu
+						value="#{MBRevisao.grupoTrabalho.coordenador.codigoEncontreiro}"
+						immediate="true" filter="true"
+						id="cmbCoordenadorGrupoTrabalhoNovo" required="true"
+						requiredMessage="O campo coordenador é obrigatório.">
+						<p:ajax listener="#{MBRevisao.recarregaListaEncontreiros}"
+							update="frmGrupoTrabalhoNovo:pnlGrupoTrabalhoNovo" event="change" />
+						<f:selectItem itemValue="" itemLabel="Selecione um coordenador..." />
+						<f:selectItems value="#{MBRevisao.comboEncontreiros}" var="item"
+							itemValue="#{item.codigoEncontreiro}" itemLabel="#{item.nome}">
+						</f:selectItems>
+					</p:selectOneMenu>
+					
+					<p:outputLabel value="Descrição:"
+						for="txtDescricaoGrupoTrabalhoNovo" />
+					<p:inputText size="30" maxlength="45"
+						value="#{MBRevisao.grupoTrabalho.descricao}"
+						id="txtDescricaoGrupoTrabalhoNovo" required="true"
+						requiredMessage="O campo descrição é obrigatório." />
+					
+
+					<p:separator />
+
+					<p:dataTable id="tblEncontreirosGruposDeTrabalho"
+						widgetVar="tabelaEncontreirosGruposDeTrabalho"
+						emptyMessage="Nenhum encontreiro retornado." paginator="true"
+						rows="5" filteredValue="#{MBRevisao.encontreirosFiltrados}"
+						value="#{MBRevisao.tabelaEncontreiros}" var="item">
+
+						<f:facet name="header">
+											Encontreiros
+										</f:facet>
+
+						<p:column headerText="Nome" filterBy="#{item.nome}"
+							SortBy="#{item.nome}">
+							<h:outputText value="#{item.nome}" />
+						</p:column>
+
+						<p:column headerText="Adicionar ao Grupo de Trabalho">
+							<p:selectBooleanCheckbox value="#{MBRevisao.checkBoxMarcado}"
+								onchange="#{MBRevisao.marcaAtivo(item)}">
+								<p:ajax listener="#{MBRevisao.addEncontreiroGrupoTrabalho}" />
+							</p:selectBooleanCheckbox>
+						</p:column>
+
+					</p:dataTable>
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Salvar"
+						actionListener="#{MBRevisao.novoGrupoTrabalho}"
+						oncomplete="verificar(xhr, status, args, 'dlgGrupoTrabalhoNovo', 'tabelaGruposDeTrabalho');"
+						update="frmWizard:tblGruposDeTrabalho :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						actionListener="#{MBRevisao.marcaAtivo}"
+						onclick="PF('dlgGrupoTrabalhoNovo').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgGrupoTrabalhoExcluir" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Grupo Trabalho - Excluir">
+			<h:form id="frmGrupoTrabalhoExcluir">
+				<h:panelGrid id="pnlGrupoTrabalhoExcluir" columns="2">
+					<h:outputText value="Código:" />
+					<h:outputText value="#{MBRevisao.grupoTrabalho.codigoGrupoTabalho}" />
+					<h:outputText value="Descrição:" />
+					<h:outputText value="#{MBRevisao.grupoTrabalho.descricao}" />
+					<h:outputText value="Coordenador:" />
+					<h:outputText value="#{MBRevisao.grupoTrabalho.coordenador.nome}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBRevisao.excluirGrupoTrabalho}"
+						oncomplete="verificar(xhr, status, args, 'dlgGrupoTrabalhoExcluir', 'tabelaEncontreirosGruposDeTrabalho');"
+						update=":frmWizard :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgGrupoTrabalhoExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgGrupoTrabalhoEditar" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Grupo Trabalho - Editar">
+			<h:form id="frmGrupoTrabalhoEditar">
+				<h:panelGrid id="pnlGrupoTrabalhoEditar" columns="2">
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBRevisao.grupoTrabalho.codigoGrupoTabalho}" />
+
+					<h:outputLabel value="Descrição: *"
+						for="txtDescricaoGrupoTrabalhoEditar" />
+					<h:inputText value="#{MBRevisao.grupoTrabalho.descricao}"
+						id="txtDescricaoGrupoTrabalhoEditar" required="true"
+						requiredMessage="O campo descrição é obrigatório." size="20"
+						maxlength="45" />
+
+					<p:outputLabel value="Coordenador:"
+						for="cmbCoordenadorGrupoTrabalhoEditar" />
+					<p:selectOneMenu size="50"
+						value="#{MBRevisao.grupoTrabalho.coordenador.codigoEncontreiro}"
+						id="cmbCoordenadorGrupoTrabalhoEditar" required="true"
+						requiredMessage="O campo coordenador é obrigatório.">
+						<p:ajax listener="#{MBRevisao.recarregaListaEncontreiros}"
+							update="frmGrupoTrabalhoEditar:tblEncontreirosGruposDeTrabalho"
+							event="change" />
+						<f:selectItem itemValue="" itemLabel="Selecione um coordenador..." />
+						<f:selectItems value="#{MBRevisao.comboEncontreiros}" var="item"
+							itemValue="#{item.codigoEncontreiro}" itemLabel="#{item.nome}" />
+					</p:selectOneMenu>
+
+					<p:separator />
+
+					<p:dataTable id="tblEncontreirosGruposDeTrabalho"
+						widgetVar="tabelaEncontreirosGruposDeTrabalho"
+						emptyMessage="Nenhum encontreiro retornado." paginator="true"
+						rows="5" filteredValue="#{MBRevisao.encontreirosFiltrados}"
+						value="#{MBRevisao.tabelaEncontreiros}" var="item">
+						<f:facet name="header">
+											Encontreiros
+										</f:facet>
+
+						<p:column headerText="Nome" filterBy="#{item.nome}"
+							SortBy="#{item.nome}">
+							<h:outputText value="#{item.nome}" />
+						</p:column>
+
+						<p:column headerText="Adicionar ao Grupo de Trabalho">
+							<p:selectBooleanCheckbox
+								value="#{MBRevisao.checkBoxMarcadoEditar[item.codigoEncontreiro]}" />
+						</p:column>
+
+					</p:dataTable>
+
+
+				</h:panelGrid>
+				<p:commandButton value="Salvar"
+					actionListener="#{MBRevisao.editarGrupoTrabalho}"
+					oncomplete="verificar(xhr, status, args, 'dlgGrupoTrabalhoEditar', 'tabelaGruposDeTrabalho');" />
+				<p:commandButton value="Cancelar"
+					onclick="PF('dlgGrupoTrabalhoEditar').hide();" />
+
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgGrupoTrabalhoDetalhes" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Grupo de Trabalho - Detalhes">
+			<h:form id="frmGrupoTrabalhoDetalhes">
+				<h:panelGrid id="pnlGrupoTrabalhoDetalhes">
+					<h:panelGrid columns="2">
+						<h:outputLabel value="Código:" />
+						<h:outputText
+							value="#{MBRevisao.grupoTrabalho.codigoGrupoTabalho}" />
+
+						<h:outputLabel value="Descrição:" />
+						<h:outputText id="txtDetalhesGrupoTrabalho"
+							value="#{MBRevisao.grupoTrabalho.descricao}" />
+					</h:panelGrid>
+					<h:panelGrid width="100%">
+						<p:dataList value="#{MBRevisao.integrantes}" paginator="true"
+							var="integrante" type="ordered"
+							emptyMessage="Nenhum registro encontrado.">
+							<f:facet name="header">
+								Integrantes
+							</f:facet>
+							<p:column>
+								<p:outputLabel value="#{integrante.nome}" />
+							</p:column>
+
+						</p:dataList>
+					</h:panelGrid>
+				</h:panelGrid>
+
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgMinistracaoNovo" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Ministração - Novo">
+			<h:form id="frmMinistracaoNovo">
+				<h:panelGrid id="pnlMinistracaoNovo" columns="2">
+					<p:outputLabel value="Nome:" for="txtNomeMinistracaoNovo" />
+					<p:inputText size="30" maxlength="45"
+						value="#{MBRevisao.ministracao.titulo}"
+						id="txtNomeMinistracaoNovo" required="true"
+						requiredMessage="O campo nome é obrigatório." />
+
+					<p:outputLabel value="Tempo em minutos:"
+						for="txtTempoMinistracaoNovo" />
+					<p:inputText size="5" maxlength="45"
+						value="#{MBRevisao.ministracao.minutos}"
+						id="txtTempoMinistracaoNovo" required="true"
+						requiredMessage="O campo nome é obrigatório." />
+
+					<p:outputLabel value="Ministrante:"
+						for="cmbMinistranteMinistracaoNovo" />
+					<p:selectOneMenu
+						value="#{MBRevisao.ministracao.ministrante.codigoEncontreiro}"
+						filter="true" id="cmbMinistranteMinistracaoNovo" required="true"
+						requiredMessage="O campo ministrante é obrigatório.">
+						<f:selectItem itemValue="" itemLabel="Selecione um ministrante..." />
+						<f:selectItems value="#{MBRevisao.comboMinistrantes}" var="item"
+							itemValue="#{item.codigoEncontreiro}" itemLabel="#{item.nome}" />
+					</p:selectOneMenu>
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Salvar"
+						actionListener="#{MBRevisao.novoMinistracao}"
+						oncomplete="verificar(xhr, status, args, 'dlgMinistracaoNovo', 'tabelaMinistracao');"
+						update=":frmWizard:tblMinistracao :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgMinistracaNovo').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgMinistracaoEditar" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Ministração - Editar">
+			<h:form id="frmMinistracaoEditar">
+				<h:panelGrid id="pnlMinistracaoEditar" columns="2">
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBRevisao.ministracao.codigoMinistracao}" />
+
+					<h:outputLabel value="Título: *" for="txtTituloMinistracaoEditar" />
+					<h:inputText value="#{MBRevisao.ministracao.titulo}"
+						id="txtTituloMinistracaoEditar" required="true"
+						requiredMessage="O campo título é obrigatório." size="20"
+						maxlength="45" />
+
+					<p:outputLabel value="Tempo em minutos:"
+						for="txtTempoMinistracaoEditar" />
+					<p:inputText size="5" maxlength="45"
+						value="#{MBRevisao.ministracao.minutos}"
+						id="txtTempoMinistracaoEditar" required="true"
+						requiredMessage="O campo nome é obrigatório." />
+
+					<p:outputLabel value="Ministrante:"
+						for="cmbMinistranteMinistracaoEditar" />
+					<p:selectOneMenu size="50"
+						value="#{MBRevisao.ministracao.ministrante.codigoEncontreiro}"
+						id="cmbMinistranteMinistracaoEditar" required="true"
+						requiredMessage="O campo ministrante é obrigatório.">
+						<f:selectItem itemValue=""
+							itemLabel="Selecione uma ministração..." />
+						<f:selectItems value="#{MBRevisao.comboMinistrantes}" var="item"
+							itemValue="#{item.codigoEncontreiro}" itemLabel="#{item.nome}" />
+					</p:selectOneMenu>
+
+				</h:panelGrid>
+				<p:commandButton value="Salvar"
+					actionListener="#{MBRevisao.editarMinistracao}"
+					oncomplete="verificar(xhr, status, args, 'dlgMinistracaoEditar', 'tabelaMinistracao');"
+					update=":frmWizard:tblMinistracao :msgGlobal" />
+				<p:commandButton value="Cancelar"
+					onclick="PF('dlgMinistracaoEditar').hide();" />
+
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgMinistracaoExcluir" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Ministração - Excluir">
+			<h:form id="frmMinistracaoExcluir">
+				<h:panelGrid id="pnlMinistracaoExcluir" columns="2">
+					<h:outputText value="Código:" />
+					<h:outputText value="#{MBRevisao.ministracao.codigoMinistracao}" />
+					<h:outputText value="Título:" />
+					<h:outputText value="#{MBRevisao.ministracao.titulo}" />
+					<h:outputText value="Tempo:" />
+					<h:outputText value="#{MBRevisao.ministracao.minutos} minutos" />
+					<h:outputText value="Ministrante:" />
+					<h:outputText value="#{MBRevisao.ministracao.ministrante.nome}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBRevisao.excluirMinistracao}"
+						oncomplete="PF('dlgMinistracaoExcluir').hide(); tabelaMinistracao.clearFilters();"
+						update=":frmWizard:tblMinistracao :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgMinistracaoExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgItemCronogramaExcluir" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Item de Cronograma - Excluir">
+			<h:form id="frmItemCronogramaExcluir">
+				<h:panelGrid id="pnlItemCronogramaExcluir" columns="2">
+					<h:outputText value="Código:" />
+					<h:outputText
+						value="#{MBRevisao.itemCronograma.codigoItemCronograma}" />
+					<h:outputText value="Tipo:" />
+					<h:outputText value="#{MBRevisao.itemCronograma.descricao}" />
+					<h:outputText value="Dia:" />
+					<h:outputText value="#{MBRevisao.itemCronograma.dia}" />
+					<h:outputText value="Hora de Início:" />
+					<h:outputText value="#{MBRevisao.itemCronograma.horaInicio}">
+						<f:convertDateTime pattern="HH:mm"/>
+					</h:outputText>
+					<h:outputText value="Hora de Fim:" />
+					<h:outputText value="#{MBRevisao.itemCronograma.horaFim}">
+						<f:convertDateTime pattern="HH:mm"/>
+					</h:outputText>
+					<h:outputText value="Intervalo:" />
+					<h:outputText
+						value="#{MBRevisao.itemCronograma.intervalo.descricaoIntervalo} ou" />
+					<h:outputText value="Ministração:" />
+					<h:outputText
+						value="#{MBRevisao.itemCronograma.ministracao.titulo}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBRevisao.excluirItemCronograma}"
+						oncomplete="PF('dlgItemCronogramaExcluir').hide(); tabelaCronograma.clearFilters();"
+						update=":frmWizard:tblCronograma :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgItemCronogramaExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgItemCronogramaNovo" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Item de Cronograma - Novo">
+			<h:form id="frmItemCronogramaNovo">
+				<h:panelGrid id="pnlItemCronogramaNovo" columns="1">
+
+					<p:selectOneRadio layout="grid" columns="2" required="true"
+						value="#{MBRevisao.radioValue}"
+						requiredMessage="É obrigatório escolher entre Intervalo ou Ministração.">
+
+						<p:ajax listener="#{MBRevisao.mudaListagemItemCronograma}"
+							event="change" update="pnlItemCronogramaNovo" />
+						<f:selectItem itemLabel="Ministração" itemValue="true" />
+
+						<f:selectItem itemLabel="Intervalo" itemValue="false" />
+					</p:selectOneRadio>
+
+					<p:outputLabel value="Dia:" for="cmbDiaItemCronogramaNovo" />
+
+					<p:selectOneMenu value="#{MBRevisao.itemCronograma.dia}"
+						filter="true" id="cmbDiaItemCronogramaNovo" required="true"
+						requiredMessage="O campo dia é obrigatório.">
+						<f:selectItem itemValue="Dia 1" itemLabel="Dia 1" />
+						<f:selectItem itemValue="Dia 2" itemLabel="Dia 2" />
+						<f:selectItem itemValue="Dia 3" itemLabel="Dia 3" />
+					</p:selectOneMenu>
+
+					<p:outputLabel id="label"
+						value="Selecione #{MBRevisao.comboLabel}:" />
+
+
+					<p:selectOneMenu value="#{MBRevisao.ministracao.codigoMinistracao}"
+						filter="true" id="cmbCronogramaMinistracaoNovo"
+						rendered="#{MBRevisao.radioValue}" required="true"
+						requiredMessage="O campo ministrante é obrigatório.">
+						<f:selectItem itemValue=""
+							itemLabel="Selecione uma ministração..." />
+						<f:selectItems value="#{MBRevisao.ministracoes}" var="item"
+							itemValue="#{item.codigoMinistracao}" itemLabel="#{item.titulo}" />
+					</p:selectOneMenu>
+
+
+					<p:inputText size="30" maxlength="45"
+						rendered="#{!MBRevisao.radioValue}"
+						value="#{MBRevisao.intervalo.descricaoIntervalo}"
+						id="txtIntervaloCronogramaNovo" required="true"
+						requiredMessage="O campo intervalo é obrigatório." />
+
+					<p:panelGrid columns="2">
+						<p:outputLabel value="Minutos:"
+							rendered="#{!MBRevisao.radioValue}"
+							for="txtMinutosIntervaloItemCronogramaNovo" />
+
+						<p:inputText size="5" maxlength="2"
+							rendered="#{!MBRevisao.radioValue}"
+							id="txtMinutosIntervaloItemCronogramaNovo" required="true"
+							value="#{MBRevisao.intervalo.minutos}"
+							requiredMessage="O campo de minutos do intervalo é obrigatório." />
+
+						<p:outputLabel value="Hora Inicial:"
+							for="txtHoraInicialItemCronogramaNovo" />
+
+						<p:calendar size="5" timeOnly="true" readonlyInput="true"
+							pattern="HH:mm" value="#{MBRevisao.itemCronograma.horaInicio}"
+							id="txtHoraInicialItemCronogramaNovo" required="true"
+							requiredMessage="O campo hora inicial é obrigatório." />
+
+					</p:panelGrid>
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Salvar"
+						actionListener="#{MBRevisao.novoItemCronograma}"
+						oncomplete="verificar(xhr, status, args, 'dlgItemCronogramaNovo', 'tabelaCronograma');"
+						update=":frmWizard:tblCronograma :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgMinistracaNovo').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgItemCronogramaEditar" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Item de Cronograma - Editar">
+			<h:form id="frmItemCronogramaEditar">
+				<h:panelGrid id="pnlItemCronogramaEditar" columns="1">
+
+					<h:outputLabel value="Código:" />
+					<h:outputText
+						value="#{MBRevisao.itemCronograma.codigoItemCronograma}" />
+
+					<p:selectOneRadio layout="grid" columns="2" required="true"
+						value="#{MBRevisao.radioValue}"
+						requiredMessage="É obrigatório escolher entre Intervalo ou Ministração.">
+
+						<p:ajax listener="#{MBRevisao.mudaListagemItemCronograma}"
+							event="change" update="pnlItemCronogramaEditar" />
+						<f:selectItem itemLabel="Ministração" itemValue="true" />
+
+						<f:selectItem itemLabel="Intervalo" itemValue="false" />
+					</p:selectOneRadio>
+
+					<p:outputLabel value="Dia:" for="cmbDiaItemCronogramaEditar" />
+
+					<p:selectOneMenu value="#{MBRevisao.itemCronograma.dia}"
+						filter="true" id="cmbDiaItemCronogramaEditar" required="true"
+						requiredMessage="O campo dia é obrigatório.">
+						<f:selectItem itemValue="Dia 1" itemLabel="Dia 1" />
+						<f:selectItem itemValue="Dia 2" itemLabel="Dia 2" />
+						<f:selectItem itemValue="Dia 3" itemLabel="Dia 3" />
+					</p:selectOneMenu>
+
+					<p:outputLabel id="label"
+						value="Selecione #{MBRevisao.comboLabel}:" />
+
+
+					<p:selectOneMenu value="#{MBRevisao.ministracao.codigoMinistracao}"
+						filter="true" id="cmbCronogramaMinistracaoEditar"
+						rendered="#{MBRevisao.radioValue}" required="true"
+						requiredMessage="O campo ministrante é obrigatório.">
+						<f:selectItem itemValue=""
+							itemLabel="Selecione uma ministração..." />
+						<f:selectItems value="#{MBRevisao.ministracoes}" var="item"
+							itemValue="#{item.codigoMinistracao}" itemLabel="#{item.titulo}" />
+					</p:selectOneMenu>
+
+
+					<p:inputText size="30" maxlength="45"
+						rendered="#{!MBRevisao.radioValue}"
+						value="#{MBRevisao.intervalo.descricaoIntervalo}"
+						id="txtIntervaloCronogramaEditar" required="true"
+						requiredMessage="O campo intervalo é obrigatório." />
+
+					<p:panelGrid columns="2">
+						<p:outputLabel value="Minutos:"
+							rendered="#{!MBRevisao.radioValue}"
+							for="txtMinutosIntervaloItemCronogramaEditar" />
+
+						<p:inputText size="5" maxlength="2"
+							rendered="#{!MBRevisao.radioValue}"
+							id="txtMinutosIntervaloItemCronogramaEditar" required="true"
+							value="#{MBRevisao.intervalo.minutos}"
+							requiredMessage="O campo de minutos do intervalo é obrigatório." />
+
+						<p:outputLabel value="Hora Inicial:"
+							for="txtHoraInicialItemCronogramaEditar" />
+
+						<p:calendar size="5" timeOnly="true" readonlyInput="true"
+							pattern="HH:mm" value="#{MBRevisao.itemCronograma.horaInicio}"
+							id="txtHoraInicialItemCronogramaEditar" required="true"
+							requiredMessage="O campo hora inicial é obrigatório." />
+
+					</p:panelGrid>
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Salvar"
+						actionListener="#{MBRevisao.editarItemCronograma}"
+						oncomplete="verificar(xhr, status, args, 'dlgItemCronogramaEditar', 'tabelaCronograma');"
+						update=":frmWizard:tblCronograma :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgMinistracaEditar').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgEscalaNovo" closable="true" draggable="true"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Escala - Novo">
+			<h:form id="frmEscalaNovo">
+				<h:panelGrid id="pnlEscalaNovo">
+					<h:panelGrid>
+
+						<p:outputLabel value="Grupo de Trabalho:"
+							for="cmbGrupoTrabalhoTarefaNovo" />
+
+						<p:selectOneMenu
+							value="#{MBRevisao.tarefa.grupoTrabalho.codigoGrupoTabalho}"
+							immediate="true" filter="true" id="cmbGrupoTrabalhoTarefaNovo"
+							required="true"
+							requiredMessage="O campo grupo de trabalho é obrigatório.">
+
+							<p:ajax listener="#{MBRevisao.carregaListaEncontreiros}"
+								update="frmEscalaNovo:pnlEscalaNovo" event="change" />
+
+							<f:selectItem itemValue=""
+								itemLabel="Selecione um grupo de trabalho..." />
+							<f:selectItems value="#{MBRevisao.gruposTrabalho}" var="item"
+								itemValue="#{item.codigoGrupoTabalho}"
+								itemLabel="#{item.descricao}">
+							</f:selectItems>
+						</p:selectOneMenu>
+
+						<p:outputLabel value="Descrição:" for="txtDescricaoTarefaNovo" />
+						<p:inputText size="30" maxlength="45"
+							value="#{MBRevisao.tarefa.descricaoTarefa}"
+							id="txtDescricaoTarefaNovo" required="true"
+							requiredMessage="O campo descrição é obrigatório." />
+
+						<p:outputLabel value="Item de Cronograma:"
+							for="cmbItemCronogramaTarefaNovo" />
+
+						<p:selectOneMenu
+							value="#{MBRevisao.tarefa.itemCronograma.codigoItemCronograma}"
+							immediate="true" filter="true" id="cmbItemCronogramaTarefaNovo"
+							required="true"
+							requiredMessage="O campo item de cronograma é obrigatório.">
+
+							<f:selectItem itemValue=""
+								itemLabel="Selecione um item de cronograma..." />
+							<f:selectItems value="#{MBRevisao.itemsCronogramas}" var="item"
+								itemValue="#{item.codigoItemCronograma}"
+								itemLabel="#{item.ministracao.titulo} #{item.intervalo.descricaoIntervalo} ">
+							</f:selectItems>
+						</p:selectOneMenu>
+
+
+					</h:panelGrid>
+
+					<h:panelGrid>
+						<p:dataTable id="tblEncontreirosTarefa"
+							widgetVar="tabelaEncontreirosTarefa"
+							emptyMessage="Nenhum encontreiro retornado." paginator="true"
+							rows="5" filteredValue="#{MBRevisao.encontreirosFiltrados}"
+							value="#{MBRevisao.tabelaEncontreiros}" var="item">
+
+							<f:facet name="header">
+											Encontreiros
+										</f:facet>
+
+							<p:column headerText="Nome" filterBy="#{item.nome}"
+								SortBy="#{item.nome}">
+								<h:outputText value="#{item.nome}" />
+							</p:column>
+
+							<p:column headerText="Adicionar encontreiros à tarefa">
+								<p:selectBooleanCheckbox value="#{MBRevisao.checkBoxMarcado}"
+									onchange="#{MBRevisao.marcaAtivo(item)}">
+									<p:ajax listener="#{MBRevisao.addEncontreiroGrupoTrabalho}" />
+								</p:selectBooleanCheckbox>
+							</p:column>
+
+						</p:dataTable>
+					</h:panelGrid>
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Salvar"
+						actionListener="#{MBRevisao.novoEscala}"
+						oncomplete="verificar(xhr, status, args, 'dlgEscalaNovo', 'tabelaEscala');"
+						update="frmWizard:tblEscala :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						actionListener="#{MBRevisao.marcaAtivo}"
+						onclick="PF('dlgEscalaNovo').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgEscalaDetalhes" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Escala - Detalhes">
+			<h:form id="frmEscalaDetalhes">
+				<h:panelGrid id="pnlEscalaDetalhes">
+					<h:panelGrid columns="2">
+						<h:outputLabel value="Código:" />
+						<h:outputText value="#{MBRevisao.tarefa.codigoTarefa}" />
+
+						<h:outputLabel value="Descrição:" />
+						<h:outputText id="txtDetalhesTarefa"
+							value="#{MBRevisao.tarefa.descricaoTarefa}" />
+
+						<h:outputLabel value="Tipo de Item de Cronograma:" />
+						<h:outputText id="txtItemCronogramaTipoTarefa"
+							value="#{MBRevisao.tarefa.itemCronograma.descricao}" />
+
+						<h:outputLabel value="Item de Cronograma:" />
+						<h:outputText id="txtItemCronogramaTarefa"
+							value="#{MBRevisao.tarefa.itemCronograma.ministracao.titulo} #{MBRevisao.tarefa.itemCronograma.intervalo.descricaoIntervalo}" />
+					</h:panelGrid>
+
+					<h:panelGrid width="100%">
+						<p:dataList value="#{MBRevisao.alocadosTarefa}" paginator="true"
+							var="encontreiro" type="ordered"
+							emptyMessage="Nenhum registro encontrado.">
+							<f:facet name="header">
+								Alocados para esta tarefa
+							</f:facet>
+							<p:column>
+								<p:outputLabel value="#{encontreiro.nome}" />
+							</p:column>
+
+						</p:dataList>
+					</h:panelGrid>
+				</h:panelGrid>
+
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgEscalaEditar" closable="true" draggable="true"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Tarefa - Editar">
+			<h:form id="frmEscalaEditar">
+				<h:panelGrid id="pnlEscalaEditar" columns="2">
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBRevisao.tarefa.codigoTarefa}" />
+
+					<p:outputLabel value="Grupo de Trabalho:"
+						for="cmbGrupoTrabalhoTarefaEditar" />
+
+					<p:selectOneMenu
+						value="#{MBRevisao.tarefa.grupoTrabalho.codigoGrupoTabalho}"
+						immediate="true" filter="true" id="cmbGrupoTrabalhoTarefaEditar"
+						required="true"
+						requiredMessage="O campo grupo de trabalho é obrigatório.">
+
+						<p:ajax listener="#{MBRevisao.carregaListaEncontreiros}"
+							update="frmEscalaEditar:pnlEscalaEditar" event="change" />
+
+						<f:selectItem itemValue=""
+							itemLabel="Selecione um grupo de trabalho..." />
+						<f:selectItems value="#{MBRevisao.gruposTrabalho}" var="item"
+							itemValue="#{item.codigoGrupoTabalho}"
+							itemLabel="#{item.descricao}">
+						</f:selectItems>
+					</p:selectOneMenu>
+
+					<h:outputLabel value="Descrição: *" for="txtDescricaoTarefaEditar" />
+					<h:inputText value="#{MBRevisao.tarefa.descricaoTarefa}"
+						id="txtDescricaoTarefaEditar" required="true"
+						requiredMessage="O campo descrição é obrigatório." size="20"
+						maxlength="45" />
+
+					<p:outputLabel value="Item de Cronograma:"
+						for="cmbItemCronogramaTarefaEditar" />
+					<p:selectOneMenu size="50"
+						value="#{MBRevisao.tarefa.itemCronograma.codigoItemCronograma}"
+						id="cmbItemCronogramaTarefaEditar" required="true"
+						requiredMessage="O campo item de cronograma é obrigatório.">
+						<p:ajax listener="#{MBRevisao.carregaListaEncontreiros}"
+							update="frmEscalaEditar:tblEncontreirosTarefa" event="change" />
+						<f:selectItem itemValue=""
+							itemLabel="Selecione um item de cronograma..." />
+						<f:selectItems value="#{MBRevisao.itemsCronogramas}" var="item"
+							itemValue="#{item.codigoItemCronograma}"
+							itemLabel="#{item.ministracao.titulo} #{item.intervalo.descricaoIntervalo} ">
+						</f:selectItems>
+					</p:selectOneMenu>
+
+					<p:separator />
+
+					<p:dataTable id="tblEncontreirosTarefa"
+						widgetVar="tabelaEncontreirosTarefa"
+						emptyMessage="Nenhum encontreiro retornado." paginator="true"
+						rows="5" filteredValue="#{MBRevisao.encontreirosFiltrados}"
+						value="#{MBRevisao.tabelaEncontreiros}" var="item">
+						<f:facet name="header">
+											Encontreiros
+										</f:facet>
+
+						<p:column headerText="Nome" filterBy="#{item.nome}"
+							SortBy="#{item.nome}">
+							<h:outputText value="#{item.nome}" />
+						</p:column>
+
+						<p:column headerText="Adicionar encontreiros à tarefa">
+							<p:selectBooleanCheckbox
+								value="#{MBRevisao.checkBoxMarcadoEditar[item.codigoEncontreiro]}" />
+						</p:column>
+
+					</p:dataTable>
+
+
+				</h:panelGrid>
+
+				<p:commandButton value="Salvar"
+					actionListener="#{MBRevisao.editarEscala}"
+					oncomplete="verificar(xhr, status, args, 'dlgEscalaEditar', 'tabelaEscala');"
+					update="frmWizard:tblEscala :msgGlobal" />
+				<p:commandButton value="Cancelar"
+					onclick="PF('dlgEscalaEditar').hide();" />
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgEscalaExcluir" closable="true"
+			draggable="true" resizable="false" modal="true" appendTo="@(body)"
+			header="Tarefa - Excluir">
+			<h:form id="frmEscalaExcluir">
+				<h:panelGrid id="pnlEscalaExcluir" columns="2">
+					<h:outputText value="Código:" />
+					<h:outputText value="#{MBRevisao.tarefa.codigoTarefa}" />
+					<h:outputText value="Descrição:" />
+					<h:outputText value="#{MBRevisao.tarefa.descricaoTarefa}" />
+					<h:outputText value="Item de Cronograma:" />
+					<h:outputText
+						value="#{MBRevisao.tarefa.itemCronograma.ministracao.titulo} #{MBRevisao.tarefa.itemCronograma.intervalo.descricaoIntervalo}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{MBRevisao.excluirEscala}"
+						oncomplete="verificar(xhr, status, args, 'dlgEscalaExcluir', 'tabelaEncontreirosEscala');"
+						update=":frmWizard :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgEscalaExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+	</ui:define>
+
+</ui:composition>

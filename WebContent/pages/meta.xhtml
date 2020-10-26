@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/modeloSistema.xhtml"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmMetaListagem">
+			<p:dataTable id="tblMeta" widgetVar="tabelaMeta"
+				emptyMessage="Nenhum registro encontrado." value="#{MBMeta.itens}"
+				var="item" filteredValue="#{MBMeta.itensFiltrados}" paginator="true"
+				rows="10">
+
+				<f:facet name="header">
+					Meta - Listagem
+				</f:facet>
+
+				<p:column headerText="Código" sortBy="#{item.codigoMeta}"
+					filterBy="#{item.codigoMeta}" filterMatchMode="contains">
+					<h:outputText value="#{item.codigoMeta}" />
+				</p:column>
+				<p:column headerText="Célula" sortBy="#{item.celula.nome}"
+					filterBy="#{item.celula.nome}" filterMatchMode="contains">
+					<h:outputText value="#{item.celula.nome}" />
+				</p:column>
+
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-plusthick"
+						oncomplete="PF('dlgMetaDetalhes').show();"
+						update=":frmMetaDetalhes:pnlMetaDetalhes" alt="Mais Detalhes"
+						actionListener="#{MBMeta.prepararDetalhes(item)}">
+						<f:setPropertyActionListener target="#{MBMeta.meta}"
+							value="#{item}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-trash"
+						oncomplete="PF('dlgMetaExcluir').show();"
+						update=":frmMetaExcluir:pnlMetaExcluir">
+						<f:setPropertyActionListener target="#{MBMeta.meta}"
+							value="#{item}" />
+					</p:commandButton>
+
+
+					<p:commandButton icon="ui-icon-pencil"
+						oncomplete="PF('dlgMetaEditar').show();"
+						update=":frmMetaEditar:pnlMetaEditar"
+						actionListener="#{MBMeta.prepararEditar(item.codigoMeta)}">
+						<f:setPropertyActionListener target="#{MBMeta.meta}"
+							value="#{item}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-circle-check"
+						oncomplete="PF('dlgMeta').show();" update=":frmMeta:pnlMeta"
+						actionListener="#{MBMeta.prepararMetaBatida(item.codigoMeta)}">
+						<f:setPropertyActionListener target="#{MBMeta.meta}"
+							value="#{item}" />
+					</p:commandButton>
+				</p:column>
+
+				<f:facet name="footer">
+					<p:commandButton value="Novo"
+						actionListener="#{MBMeta.prepararNovo}"
+						oncomplete="PF('dlgMetaNovo').show();"
+						update=":frmMetaNovo:pnlMetaNovo :msgGlobal" />
+				</f:facet>
+
+			</p:dataTable>
+		</h:form>
+
+		<p:dialog widgetVar="dlgMetaNovo" closable="true" draggable="true"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Meta - Novo">
+			<h:form id="frmMetaNovo">
+				<h:panelGrid id="pnlMetaNovo" columns="2">
+
+					<p:outputLabel value="Selecione uma data de revisão:" />
+					<p:selectOneRadio layout="grid" columns="2" required="true"
+						value="#{MBMeta.dataRevisao}"
+						requiredMessage="É obrigatório selecionar uma data planejada.">
+						<f:selectItem
+							itemLabel="#{MBMeta.planejamento.revisao1.dataFormatada}"
+							itemValue="#{MBMeta.planejamento.revisao1.dataDeAcontecimento}" />
+						<f:selectItem
+							itemLabel="#{MBMeta.planejamento.revisao2.dataFormatada}"
+							itemValue="#{MBMeta.planejamento.revisao2.dataDeAcontecimento}" />
+						<f:selectItem
+							itemLabel="#{MBMeta.planejamento.revisao3.dataFormatada}"
+							itemValue="#{MBMeta.planejamento.revisao3.dataDeAcontecimento}" />
+						<f:selectItem
+							itemLabel="#{MBMeta.planejamento.revisao4.dataFormatada}"
+							itemValue="#{MBMeta.planejamento.revisao4.dataDeAcontecimento}" />
+					</p:selectOneRadio>
+
+
+					<p:outputLabel value="Célula:" for="cmbCelulaMetaNovo" />
+					<p:selectOneMenu value="#{MBMeta.meta.celula.codigoCelula}"
+						filter="true" id="cmbCelulaMetaNovo" required="true"
+						requiredMessage="O campo célula é obrigatório.">
+						<f:selectItem itemValue="" itemLabel="Selecione uma célula..." />
+						<f:selectItems value="#{MBMeta.comboCelulas}" var="item"
+							itemValue="#{item.codigoCelula}" itemLabel="#{item.nome}" />
+					</p:selectOneMenu>
+
+					<p:separator />
+
+					<p:dataTable id="tblItemsDoacaoMeta" editable="true"
+						widgetVar="tabelaItemsDoacaoMeta" editMode="cell"
+						emptyMessage="Nenhum item de doação retornado." paginator="true"
+						rows="5" filteredValue="#{MBMeta.itemsDoacaoMetaFiltrado}"
+						value="#{MBMeta.tabelaItemsDoacao}" var="item">
+
+						<p:ajax event="cellEdit" listener="#{MBMeta.editarItemDoacao}"
+							update=":msgGlobal" />
+
+
+						<f:facet name="header">
+											Itens de Doação
+										</f:facet>
+
+						<p:column headerText="Descrição" filterBy="#{item.descricao}"
+							SortBy="#{item.descricao}">
+							<h:outputText value="#{item.descricao}" />
+						</p:column>
+
+						<p:column headerText="Quantidade" filterBy="#{item.quantidadeMeta}"
+							SortBy="#{item.quantidadeMeta}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{item.quantidadeMeta}" />
+								</f:facet>
+								<f:facet name="input">
+									<h:inputText value="#{item.quantidadeMeta}" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+
+						<p:column headerText="Adicionar à Meta">
+							<p:selectBooleanCheckbox value="#{MBMeta.checkBoxMarcado}"
+								onchange="#{MBMeta.marcaAtivo(item)}">
+								<p:ajax listener="#{MBMeta.addItemDoacaoMeta}" />
+							</p:selectBooleanCheckbox>
+						</p:column>
+
+					</p:dataTable>
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+
+
+					<p:commandButton value="Salvar" actionListener="#{MBMeta.novo}"
+						oncomplete="verificar(xhr, status, args, 'dlgMetaNovo', 'tabelaMeta')"
+						update=":frmMetaListagem:tblMeta :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgMetaNovo').hide();" />
+
+				</h:panelGrid>
+			</h:form>
+
+			<h:form>
+				<p:commandButton value="Novo Item"
+					actionListener="#{MBMeta.prepararNovoItem}"
+					oncomplete="PF('dlgItemNovo').show();"
+					update=":frmItemDoacaoNovo:pnlItemDoacaoNovo :msgGlobal" />
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgItemNovo" closable="true"
+			dynamic="false" draggable="true" resizable="false" modal="true"
+			appendTo="@(body)" header="Item - Novo">
+			<h:form id="frmItemDoacaoNovo">
+				<h:panelGrid id="pnlItemDoacaoNovo" columns="2">
+					<p:outputLabel value="Descrição" for="txtDescItemDoacaoNovo" />
+					<p:inputText id="txtDescItemDoacaoNovo" size="30" maxlength="250"
+						value="#{MBMeta.itemDoacaoMeta.descricao}" required="true"
+						requiredMessage="O campo descrição é obrigatório."
+						validatorMessage="Este campo aceita apenas letras e espaços.">
+						<f:validateRegex pattern="[a-zA-ZzáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]*" />
+					</p:inputText>
+
+					<p:outputLabel value="Quantidade" for="txtQuantItemDoacaoNovo" />
+					<p:inputText id="txtQuantItemDoacaoNovo" size="5" maxlength="3"
+						value="#{MBMeta.itemDoacaoMeta.quantidadeMeta}" required="true"
+						requiredMessage="O campo quantidade é obrigatório."
+						validatorMessage="Este campo aceita apenas números.">
+						<f:convertNumber maxIntegerDigits="4" />
+					</p:inputText>
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Salvar"
+						actionListener="#{MBMeta.novoItemDoacao}"
+						oncomplete="verificar(xhr, status, args, 'dlgItemDoacaoNovo', 'tabelaItemsDoacaoMeta');"
+						update=":frmMetaNovo:tblItemsDoacaoMeta :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgItemDoacaoNovo').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+
+		<p:dialog widgetVar="dlgMetaExcluir" closable="true" draggable="true"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Meta - Excluir">
+			<h:form id="frmMetaExcluir">
+				<h:panelGrid id="pnlMetaExcluir" columns="2">
+					<h:outputText value="Código:" />
+					<h:outputText value="#{MBMeta.meta.codigoMeta}" />
+					<h:outputText value="Célula:" />
+					<h:outputText value="#{MBMeta.meta.celula.nome}" />
+					<h:outputText value="Data de Revisão:" />
+					<h:outputText value="#{MBMeta.meta.revisaoDeVidas.dataFormatada}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir" actionListener="#{MBMeta.excluir}"
+						oncomplete="PF('dlgMetaExcluir').hide(); tabelaMeta.clearFilters();"
+						update=":frmMetaListagem:tblMeta :msgGlobal" />
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgMetaExcluir').hide();" />
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgMetaEditar" closable="true" draggable="true"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Meta - Editar">
+			<h:form id="frmMetaEditar">
+				<h:panelGrid id="pnlMetaEditar" columns="2">
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBMeta.meta.codigoMeta}" />
+
+					<p:outputLabel value="Selecione uma data de revisão:" />
+					<p:selectOneRadio layout="grid" columns="2" required="true"
+						value="#{MBMeta.dataRevisao}"
+						requiredMessage="É obrigatório selecionar uma data planejada.">
+						<f:selectItem
+							itemLabel="#{MBMeta.planejamento.revisao1.dataFormatada}"
+							itemValue="#{MBMeta.planejamento.revisao1.dataDeAcontecimento}" />
+						<f:selectItem
+							itemLabel="#{MBMeta.planejamento.revisao2.dataFormatada}"
+							itemValue="#{MBMeta.planejamento.revisao2.dataDeAcontecimento}" />
+						<f:selectItem
+							itemLabel="#{MBMeta.planejamento.revisao3.dataFormatada}"
+							itemValue="#{MBMeta.planejamento.revisao3.dataDeAcontecimento}" />
+						<f:selectItem
+							itemLabel="#{MBMeta.planejamento.revisao4.dataFormatada}"
+							itemValue="#{MBMeta.planejamento.revisao4.dataDeAcontecimento}" />
+					</p:selectOneRadio>
+
+					<p:outputLabel value="Célula:" for="cmbCelulaMetaEditar" />
+					<p:selectOneMenu value="#{MBMeta.meta.celula.codigoCelula}"
+						filter="true" id="cmbCelulaMetaEditar" required="true"
+						requiredMessage="O campo célula é obrigatório.">
+						<f:selectItem itemValue="" itemLabel="Selecione uma célula..." />
+						<f:selectItems value="#{MBMeta.comboCelulas}" var="item"
+							itemValue="#{item.codigoCelula}" itemLabel="#{item.nome}" />
+					</p:selectOneMenu>
+
+					<p:separator />
+
+					<p:dataTable id="tblItemsDoacaoMeta"
+						widgetVar="tabelaItemsDoacaoMeta"
+						emptyMessage="Nenhum item de doação retornado." paginator="true"
+						rows="5" filteredValue="#{MBMeta.itemsDoacaoMetaFiltrado}"
+						value="#{MBMeta.tabelaItemsDoacao}" var="item">
+
+						<f:facet name="header">
+											Itens de Doação
+										</f:facet>
+
+						<p:column headerText="Descrição" filterBy="#{item.descricao}"
+							SortBy="#{item.descricao}">
+							<h:outputText value="#{item.descricao}" />
+						</p:column>
+
+						<p:column headerText="Adicionar à Meta">
+							<p:selectBooleanCheckbox
+								value="#{MBMeta.checkBoxMarcadoEditar[item.codigoItemDoacao]}"
+								onchange="#{MBMeta.marcaAtivo(item)}">
+								<p:ajax listener="#{MBMeta.addItemDoacaoMeta}" />
+							</p:selectBooleanCheckbox>
+						</p:column>
+
+					</p:dataTable>
+
+
+				</h:panelGrid>
+
+				<p:commandButton value="Salvar" actionListener="#{MBMeta.editar}"
+					oncomplete="verificar(xhr, status, args, 'dlgMetaEditar', 'tabelaMeta');"
+					update=":frmMetaListagem:tblMeta :msgGlobal" />
+				<p:commandButton value="Cancelar"
+					onclick="PF('dlgMetaEditar').hide();" />
+
+			</h:form>
+		</p:dialog>
+
+		<p:dialog widgetVar="dlgMeta" closable="true" draggable="true"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Meta - Editar">
+			<h:form id="frmMeta">
+				<h:panelGrid id="pnlMeta" columns="2">
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBMeta.meta.codigoMeta}" />
+
+
+					<p:outputLabel value="Célula:" />
+					<h:outputText value="#{MBMeta.meta.celula.nome}" />
+
+					<p:separator />
+
+					<p:dataTable id="tblItemsDoacaoMeta" 
+						widgetVar="tabelaItemsDoacaoMeta" 
+						emptyMessage="Nenhum item de doação retornado." paginator="true"
+						rows="5" filteredValue="#{MBMeta.itemsDoacaoMetaFiltrado}"
+						value="#{MBMeta.tabelaItemsDoacao}" var="item">
+
+
+
+						<f:facet name="header">
+											Itens de Doação
+										</f:facet>
+
+						<p:column headerText="Descrição" filterBy="#{item.descricao}"
+							SortBy="#{item.descricao}">
+							<h:outputText value="#{item.descricao}" />
+						</p:column>
+						
+						<p:column headerText="Quantidade estipulada em meta">
+							<p:outputLabel  value="#{item.quantidadeMeta}" />
+						</p:column>
+						
+
+						<p:column headerText="Quantidade alcançada">
+							<p:inputText value="#{item.quantidadeAlcancada}" >
+								<p:ajax event="change" listener="#{MBMeta.editarItemDoacaoEstoque(item.codigoItemDoacao, item.quantidadeAlcancada)}"
+									update=":msgGlobal" />
+							</p:inputText>
+
+						</p:column>
+
+
+					</p:dataTable>
+
+				</h:panelGrid>
+
+				<p:commandButton value="Cancelar"
+					onclick="PF('dlgMetaEditar').hide();" />
+
+			</h:form>
+		</p:dialog>
+
+
+
+		<p:dialog widgetVar="dlgMetaDetalhes" closable="true" draggable="true"
+			resizable="false" modal="true" appendTo="@(body)"
+			header="Meta - Detalhes">
+			<h:form id="frmMetaDetalhes">
+				<h:panelGrid id="pnlMetaDetalhes">
+					<h:panelGrid columns="2">
+						<h:outputLabel value="Código:" />
+						<h:outputText value="#{MBMeta.meta.codigoMeta}" />
+
+						<h:outputLabel value="Célula:" />
+						<h:outputText id="txtMetaCelula"
+							value="#{MBMeta.meta.celula.nome}" />
+					</h:panelGrid>
+					<h:panelGrid width="100%">
+						<p:dataList value="#{MBMeta.itemsDoacaoMeta}" paginator="true"
+							var="item" type="ordered"
+							emptyMessage="Nenhum registro encontrado.">
+							<f:facet name="header">
+								Itens de Doação
+							</f:facet>
+							
+
+							<p:column headerText="Descrição">
+								<p:outputLabel value="#{item.descricao}" />
+							</p:column>
+							
+							<p:column headerText="Meta">
+								<p:outputLabel value="#{item.quantidadeMeta}" />
+							</p:column>
+							
+							<p:column headerText="Quantidade atual">
+								<p:outputLabel value="#{item.quantidadeAlcancada}" />
+							</p:column>
+
+						</p:dataList>
+					</h:panelGrid>
+				</h:panelGrid>
+
+			</h:form>
+		</p:dialog>
+	</ui:define>
+
+</ui:composition>

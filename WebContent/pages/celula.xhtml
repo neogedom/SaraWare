@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/modeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmCelulaListagem">
+			<p:dataTable id="tblCelula" widgetVar="tabelaCelula"
+				emptyMessage="Nenhum registro encontrado."
+				value="#{MBCelula.itens}" var="item"
+				filteredValue="#{MBCelula.itensFiltrados}"
+				paginator="true" rows="10">
+				
+				<f:facet name="header">
+					Celula - Listagem
+				</f:facet>
+				
+				<p:column headerText="Código" sortBy="#{item.codigoCelula}"
+					filterBy="#{item.codigoCelula}" filterMatchMode="contains">
+					<h:outputText value="#{item.codigoCelula}" />
+				</p:column>
+				<p:column headerText="Nome" sortBy="#{item.nome}"
+					filterBy="#{item.nome}" filterMatchMode="contains">
+					<h:outputText value="#{item.nome}" />
+				</p:column>
+				
+				<p:column headerText="Líder" sortBy="#{item.lider.nome}"
+					filterBy="#{item.lider.nome}" filterMatchMode="contains">
+					<h:outputText value="#{item.lider.nome}" />
+				</p:column>
+				
+				<p:column headerText="Opções">
+				<p:commandButton icon="ui-icon-plusthick" 
+										oncomplete="PF('dlgCelulaDetalhes').show();"
+										update=":frmCelulaDetalhes:pnlCelulaDetalhes" alt="Mais Detalhes"
+										actionListener="#{MBCelula.prepararDetalhes(item)}">
+											<f:setPropertyActionListener target="#{MBCelula.celula}" value="#{item}" />
+										</p:commandButton>
+					
+					<p:commandButton icon="ui-icon-trash" 
+										oncomplete="PF('dlgCelulaExcluir').show();"
+										update=":frmCelulaExcluir:pnlCelulaExcluir">
+											<f:setPropertyActionListener target="#{MBCelula.celula}" value="#{item}" />
+										</p:commandButton>
+
+										
+										<p:commandButton icon="ui-icon-pencil"  
+										oncomplete="PF('dlgCelulaEditar').show();"
+										update=":frmCelulaEditar:pnlCelulaEditar" 
+										actionListener="#{MBCelula.prepararEditar}">
+											<f:setPropertyActionListener target="#{MBCelula.celula}" value="#{item}" />
+										</p:commandButton>
+				</p:column>
+								
+				<f:facet name="footer">
+					<p:commandButton value="Novo" actionListener="#{MBCelula.prepararNovo}" 
+									oncomplete="PF('dlgCelulaNovo').show();"
+									update=":frmCelulaNovo:pnlCelulaNovo :msgGlobal" />
+				</f:facet>
+				
+			</p:dataTable>
+		</h:form>
+		
+		<p:dialog widgetVar="dlgCelulaNovo" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Celula - Novo" >
+				<h:form id="frmCelulaNovo">
+					<h:panelGrid id="pnlCelulaNovo" columns="2">
+						<p:outputLabel value="Nome:" for="txtNomeCelulaNovo" />
+						<p:inputText size="30" maxlength="45" value="#{MBCelula.celula.nome}" 
+							id="txtNomeCelulaNovo"
+							required="true" requiredMessage="O campo nome é obrigatório."/>
+						
+						<p:outputLabel value="Líder:" for="cmbLiderCelulaNovo"/>
+						<p:selectOneMenu value="#{MBCelula.celula.lider.codigoLider}" filter="true"
+							id="cmbLiderCelulaNovo" 
+							required="true" requiredMessage="O campo líder é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um líder..."/>
+							<f:selectItems value="#{MBCelula.comboLideres}" var="item" 
+									itemValue="#{item.codigoLider}" itemLabel="#{item.nome}"/>
+						</p:selectOneMenu>
+					</h:panelGrid>
+					
+					<h:panelGrid columns="2">
+						<p:commandButton value="Salvar" actionListener="#{MBCelula.novo}"
+							oncomplete="verificar(xhr, status, args, 'dlgCelulaNovo', 'tabelaCelula');"
+							update=":frmCelulaListagem:tblCelula :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgCelulaNovo').hide();"/>
+					</h:panelGrid>
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgCelulaExcluir" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Celula - Excluir">
+				<h:form id="frmCelulaExcluir">
+				<h:panelGrid id="pnlCelulaExcluir" columns="2">
+					<h:outputText value="Código:" />
+					<h:outputText value="#{MBCelula.celula.codigoCelula}" />
+					<h:outputText value="Descrição:" />
+					<h:outputText value="#{MBCelula.celula.nome}" />
+					<h:outputText value="Líder:" />
+					<h:outputText value="#{MBCelula.celula.lider.nome}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir" actionListener="#{MBCelula.excluir}"
+							oncomplete="PF('dlgCelulaExcluir').hide(); tabelaCelula.clearFilters();"
+							update=":frmCelulaListagem:tblCelula :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgCelulaExcluir').hide();"/>
+				</h:panelGrid>
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgCelulaEditar" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Célula - Editar">
+				<h:form id="frmCelulaEditar">
+				<h:panelGrid id="pnlCelulaEditar" columns="2">
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBCelula.celula.codigoCelula}" />
+					
+					<h:outputLabel value="Nome: *" for="txtNomeCelulaEditar" />
+					<h:inputText value="#{MBCelula.celula.nome}" id="txtNomeCelulaEditar"
+						required="true" requiredMessage="O campo nome é obrigatório." 
+						size="20" maxlength="45" />
+					
+					<p:outputLabel value="Líder:" for="cmbLiderCelulaEditar" />
+					<p:selectOneMenu size="50" value="#{MBCelula.celula.lider.codigoLider}"
+						id="cmbLiderCelulaEditar" 
+						required="true" requiredMessage="O campo líder é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um líder..."/>
+							<f:selectItems value="#{MBCelula.comboLideres}" var="item" 
+									itemValue="#{item.codigoLider}" itemLabel="#{item.nome}"/>
+						</p:selectOneMenu>
+					
+				</h:panelGrid>
+					<p:commandButton value="Salvar" actionListener="#{MBCelula.editar}"
+							oncomplete="verificar(xhr, status, args, 'dlgCelulaEditar', 'tabelaCelula');"
+							update=":frmCelulaListagem:tblCelula :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgCelulaEditar').hide();"/>
+					
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgCelulaDetalhes" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Célula - Detalhes">
+				<h:form id="frmCelulaDetalhes">
+				<h:panelGrid id="pnlCelulaDetalhes">
+					<h:panelGrid columns="2">
+						<h:outputLabel value="Código:" />
+						<h:outputText value="#{MBCelula.celula.codigoCelula}" />
+					
+						<h:outputLabel value="Nome:" />
+						<h:outputText id="txtDetalhesCelula" value="#{MBCelula.celula.nome}" />
+					</h:panelGrid>
+					<h:panelGrid width="100%">	
+						<p:dataList value="#{MBCelula.membros}" paginator="true" var="membro" type="ordered"
+							emptyMessage="Nenhum registro encontrado.">
+							<f:facet name="header">
+								Membros
+							</f:facet>
+							
+							<p:column>
+								<p:outputLabel value="#{membro.nome}"/>
+							</p:column>
+							
+						</p:dataList>
+					</h:panelGrid>	
+					</h:panelGrid>		
+					
+				</h:form>
+		</p:dialog>
+	</ui:define>
+
+</ui:composition>

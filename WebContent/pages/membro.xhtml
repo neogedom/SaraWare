@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/modeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmMembroListagem">
+			<p:dataTable id="tblMembro" widgetVar="tabelaMembro"
+				emptyMessage="Nenhum registro encontrado."
+				value="#{MBMembro.itens}" var="item"
+				filteredValue="#{MBMembro.itensFiltrados}"
+				paginator="true" rows="10">
+				
+				<f:facet name="header">
+					Membro - Listagem
+				</f:facet>
+				
+				<p:column headerText="Código" sortBy="#{item.codigoMembro}"
+					filterBy="#{item.codigoMembro}" filterMatchMode="contains">
+					<h:outputText value="#{item.codigoMembro}" />
+				</p:column>
+				
+				<p:column headerText="Nome" sortBy="#{item.nome}"
+					filterBy="#{item.nome}" filterMatchMode="contains">
+					<h:outputText value="#{item.nome}" />
+				</p:column>
+				
+				<p:column headerText="Instituto de Vencedores" sortBy="#{item.statusIV}"
+					filterBy="#{item.statusIV}" filterMatchMode="contains">
+					<h:outputText value="#{item.statusIV}" />
+				</p:column>
+				
+				<p:column headerText="Data de Batismo" sortBy="#{item.dataBatismo}"
+					filterBy="#{item.dataBatismo}" filterMatchMode="contains">
+					<h:outputText value="#{item.dataBatismo}">
+						<f:convertDateTime pattern="dd/MM/yyyy"/>
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="Hierarquia" sortBy="#{item.hierarquia.descricao}"
+					filterBy="#{item.hierarquia.descricao}" filterMatchMode="contains">
+					<h:outputText value="#{item.hierarquia.descricao}" />
+				</p:column>
+				
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-plusthick" 
+										oncomplete="PF('dlgMembroDetalhes').show();"
+										update=":frmMembroDetalhes:pnlMembroDetalhes" alt="Mais Detalhes">
+											<f:setPropertyActionListener target="#{MBMembro.membro}" value="#{item}" />
+										</p:commandButton>
+					
+					<p:commandButton icon="ui-icon-trash" 
+										oncomplete="PF('dlgMembroExcluir').show();"
+										update=":frmMembroExcluir:pnlMembroExcluir" alt="Excluir">
+											<f:setPropertyActionListener target="#{MBMembro.membro}" value="#{item}" />
+										</p:commandButton>
+
+										
+					<p:commandButton icon="ui-icon-pencil"  
+										oncomplete="PF('dlgMembroEditar').show();"
+										update=":frmMembroEditar:pnlMembroEditar" 
+										actionListener="#{MBMembro.prepararEditar}" alt="Editar">
+											<f:setPropertyActionListener target="#{MBMembro.membro}" value="#{item}" />
+										</p:commandButton>
+				</p:column>
+								
+				<f:facet name="footer">
+					<p:commandButton value="Novo" actionListener="#{MBMembro.prepararNovo}" 
+									oncomplete="PF('dlgMembroNovo').show();"
+									update=":frmMembroNovo:pnlMembroNovo :msgGlobal" />
+				</f:facet>
+				
+			</p:dataTable>
+		</h:form>
+		
+		<p:dialog widgetVar="dlgMembroNovo" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Membro - Novo" >
+				<h:form id="frmMembroNovo">
+					<h:panelGrid id="pnlMembroNovo" columns="2">
+						<p:outputLabel value="Nome:" for="txtNomeMembroNovo" />
+						<p:inputText size="30" maxlength="45" value="#{MBMembro.membro.nome}" 
+							id="txtNomeMembroNovo"
+							required="true" requiredMessage="O campo nome é obrigatório."/>
+						
+						<p:outputLabel value="Endereço:" for="txtEnderecoMembroNovo" />
+						<p:inputText size="30" maxlength="45" value="#{MBMembro.membro.endereco}" 
+							id="txtEnderecoMembroNovo"
+							required="true" requiredMessage="O campo endereço é obrigatório."/>
+						
+						<p:outputLabel value="Telefone:" for="txtTelefoneMembroNovo" />
+						<p:inputText size="30" maxlength="15" value="#{MBMembro.membro.telefone}" 
+							id="txtTelefoneMembroNovo"
+							required="true" requiredMessage="O campo telefone é obrigatório."/>
+						
+						<p:outputLabel value="Nascimento:" for="txtNascimentoMembroNovo" />
+						<p:calendar id="txtNascimentoMembroNovo" value="#{MBMembro.membro.dataNascimento}" 
+							required="true" requiredMessage="O campo data de nascimento é obrigatório." 
+							readonlyInput="true" pattern="dd/MM/yyyy" yearRange="c-100:c+0" maxdate="#{MBPlanejamento.dataAtual}" mindate="01/01/1900"
+							navigator="true"/>
+						
+						<p:outputLabel value="Nº Documento:" for="txtNumeroDocumentoMembroNovo" />
+						<p:inputText size="30" maxlength="45" value="#{MBMembro.membro.numeroDocumento}" 
+							id="txtNumeroDocumentoMembroNovo"
+							required="true" requiredMessage="O campo número de documento é obrigatório."/>
+						
+						<p:outputLabel value="Tipo de Documento:" for="cmbTipoDocumentoMembroNovo"/>
+						<p:selectOneMenu value="#{MBMembro.membro.tipoDocumento}" filter="true"
+							id="cmbTipoDocumentoMembroNovo" 
+							required="true" requiredMessage="O campo tipo de documento é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um tipo de documento..."/>
+							<f:selectItem itemValue="CPF" itemLabel="CPF"/>
+							<f:selectItem itemValue="RG" itemLabel="RG"/>
+							<f:selectItem itemValue="CNH" itemLabel="CNH"/>
+							<f:selectItem itemValue="Certidão de Nascimento" itemLabel="Certidão de Nascimento"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Sexo:" for="cmbSexoMembroNovo" />
+						<p:selectOneMenu value="#{MBMembro.membro.sexo}" filter="true"
+							id="cmbSexoMembroNovo" 
+							required="true" requiredMessage="O campo sexo é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um sexo..."/>
+							<f:selectItem itemValue="CPF" itemLabel="MASCULINO"/>
+							<f:selectItem itemValue="RG" itemLabel="FEMININO"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Estado Civil:" for="cmbEstadoCivilMembroNovo" />
+						<p:selectOneMenu value="#{MBMembro.membro.estadoCivil}" filter="true"
+							id="cmbEstadoCivilMembroNovo" 
+							required="true" requiredMessage="O campo estado civil é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um estado civil..."/>
+							<f:selectItem itemValue="SOLTEIRO(A)" itemLabel="SOLTEIRO(A)"/>
+							<f:selectItem itemValue="CASADO(A)" itemLabel="CASADO(A)"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Batismo:" for="txtBatismoMembroNovo" />
+						<p:calendar id="txtBatismoMembroNovo" value="#{MBMembro.membro.dataBatismo}" 
+							required="true" requiredMessage="O campo data de batismo é obrigatório." 
+							readonlyInput="true" selectOtherMonths="true" yearRange="c-100:c+0" maxdate="#{MBPlanejamento.dataAtual}" pattern="dd/MM/yyyy" 
+							mindate="01/01/1900"/>
+						
+						<p:outputLabel value="Status I.V.:" for="cmbStatusIVMembroNovo"/>
+						<p:selectOneMenu value="#{MBMembro.membro.statusIV}" filter="true"
+							id="cmbStatusIVMembroNovo" required="true" requiredMessage="O campo status I. V. é obrigatório." >
+							<f:selectItem itemValue="" itemLabel="Selecione um status..."/>
+							<f:selectItem itemValue="NÃO INICIADO" itemLabel="NÃO INICIADO"/>
+							<f:selectItem itemValue="1º MÓDULO" itemLabel="1º MÓDULO"/>
+							<f:selectItem itemValue="2º MÓDULO" itemLabel="2º MÓDULO"/>
+							<f:selectItem itemValue="3º MÓDULO" itemLabel="3º MÓDULO"/>
+							<f:selectItem itemValue="CONCLUÍDO" itemLabel="CONCLUÍDO"/>
+						</p:selectOneMenu>
+								
+						<p:outputLabel value="Célula:" for="cmbCelulaMembroNovo"/>
+						<p:selectOneMenu value="#{MBCelula.celula.codigoCelula}" filter="true"
+							id="cmbCelulaMembroNovo" >
+							<f:selectItem itemValue="" itemLabel="Selecione uma célula..."/>
+							<f:selectItems value="#{MBCelula.itens}" var="item" 
+									itemValue="#{item.codigoCelula}" itemLabel="#{item.nome}"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Hierarquia:" for="cmbHierarquiaMembroNovo"/>
+						<p:selectOneMenu value="#{MBMembro.membro.hierarquia.codigoHierarquia}" filter="true"
+							id="cmbHierarquiaMembroNovo" 
+							required="true" requiredMessage="O campo hierarquia é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione uma hierarquia..."/>
+							<f:selectItems value="#{MBMembro.comboHierarquias}" var="item" 
+									itemValue="#{item.codigoHierarquia}" itemLabel="#{item.descricao}"/>
+						</p:selectOneMenu>
+						
+					</h:panelGrid>
+					
+					<h:panelGrid columns="2">
+						<p:commandButton value="Salvar" actionListener="#{MBMembro.novo}" action="#{MBCelula.inserirMembroCelula}"
+							oncomplete="verificar(xhr, status, args, 'dlgMembroNovo', 'tabelaMembro');"
+							update=":frmMembroListagem:tblMembro :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgMembroNovo').hide();"/>
+					</h:panelGrid>
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgMembroExcluir" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Membro - Excluir">
+				<h:form id="frmMembroExcluir">
+				<h:panelGrid id="pnlMembroExcluir" columns="2">
+					<h:outputText value="Código:" />
+					<h:outputText value="#{MBMembro.membro.codigoMembro}" />
+					<h:outputText value="Nome:" />
+					<h:outputText value="#{MBMembro.membro.nome}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir" actionListener="#{MBMembro.excluir}"
+							oncomplete="PF('dlgMembroExcluir').hide(); tabelaMembro.clearFilters();"
+							update=":frmMembroListagem:tblMembro :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgMembroExcluir').hide();"/>
+				</h:panelGrid>
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgMembroEditar" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Membro - Editar">
+				
+				<h:form id="frmMembroEditar">
+				<h:panelGrid id="pnlMembroEditar" columns="2">
+					
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBMembro.membro.codigoMembro}" />
+					
+					<p:outputLabel value="Nome:" for="txtNomeMembroEditar" />
+						<p:inputText size="30" maxlength="45" value="#{MBMembro.membro.nome}" 
+							id="txtNomeMembroEditar"
+							required="true" requiredMessage="O campo nome é obrigatório."/>
+						
+					<p:outputLabel value="Endereço:" for="txtEnderecoMembroEditar" />
+						<p:inputText size="30" maxlength="45" value="#{MBMembro.membro.endereco}" 
+							id="txtEnderecoMembroEditar"
+							required="true" requiredMessage="O campo endereço é obrigatório."/>
+						
+						<p:outputLabel value="Telefone:" for="txtTelefoneMembroEditar" />
+						<p:inputText size="30" maxlength="15" value="#{MBMembro.membro.telefone}" 
+							id="txtTelefoneMembroEditar"
+							required="true" requiredMessage="O campo telefone é obrigatório."/>
+						
+						<p:outputLabel value="Nascimento:" for="txtNascimentoMembroEditar" />
+						<p:calendar id="txtNascimentoMembroEditar" value="#{MBMembro.membro.dataNascimento}" 
+							required="true" requiredMessage="O campo data de nascimento é obrigatório." 
+							readonlyInput="true" pattern="dd/MM/yyyy" yearRange="c-100:c+0" mindate="01/01/1900"
+							navigator="true"/>
+						
+						<p:outputLabel value="Nº Documento:" for="txtNumeroDocumentoMembroEditar" />
+						<p:inputText size="30" maxlength="45" value="#{MBMembro.membro.numeroDocumento}" 
+							id="txtNumeroDocumentoMembroEditar"
+							required="true" requiredMessage="O campo número de documento é obrigatório."/>
+						
+						<p:outputLabel value="Tipo de Documento:" for="cmbTipoDocumentoMembroEditar"/>
+						<p:selectOneMenu value="#{MBMembro.membro.tipoDocumento}" filter="true"
+							id="cmbTipoDocumentoMembroEditar" 
+							required="true" requiredMessage="O campo tipo de documento é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um tipo de documento..."/>
+							<f:selectItem itemValue="CPF" itemLabel="CPF"/>
+							<f:selectItem itemValue="RG" itemLabel="RG"/>
+							<f:selectItem itemValue="CNH" itemLabel="CNH"/>
+							<f:selectItem itemValue="Certidão de Nascimento" itemLabel="Certidão de Nascimento"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Sexo:" for="cmbSexoMembroEditar" />
+						<p:selectOneMenu value="#{MBMembro.membro.sexo}" filter="true"
+							id="cmbSexoMembroEditar" 
+							required="true" requiredMessage="O campo sexo é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um sexo..."/>
+							<f:selectItem itemValue="CPF" itemLabel="MASCULINO"/>
+							<f:selectItem itemValue="RG" itemLabel="FEMININO"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Estado Civil:" for="cmbEstadoCivilMembroEditar" />
+						<p:selectOneMenu value="#{MBMembro.membro.estadoCivil}" filter="true"
+							id="cmbEstadoCivilMembroEditar" 
+							required="true" requiredMessage="O campo estado civil é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um estado civil..."/>
+							<f:selectItem itemValue="SOLTEIRO(A)" itemLabel="SOLTEIRO(A)"/>
+							<f:selectItem itemValue="CASADO(A)" itemLabel="CASADO(A)"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Batismo:" for="txtBatismoMembroEditar" />
+						<p:calendar id="txtBatismoMembroEditar" value="#{MBMembro.membro.dataBatismo}" 
+							required="true" requiredMessage="O campo data de batismo é obrigatório." 
+							readonlyInput="true" selectOtherMonths="true" yearRange="c-100:c+0" pattern="dd/MM/yyyy" 
+							mindate="01/01/1900"/>
+						
+						<p:outputLabel value="Status I.V.:" for="cmbStatusIVMembroEditar"/>
+						<p:selectOneMenu value="#{MBMembro.membro.statusIV}" filter="true"
+							id="cmbStatusIVMembroEditar" required="true" requiredMessage="O campo status I. V. é obrigatório." >
+							<f:selectItem itemValue="" itemLabel="Selecione um status..."/>
+							<f:selectItem itemValue="NÃO INICIADO" itemLabel="NÃO INICIADO"/>
+							<f:selectItem itemValue="1º MÓDULO" itemLabel="1º MÓDULO"/>
+							<f:selectItem itemValue="2º MÓDULO" itemLabel="2º MÓDULO"/>
+							<f:selectItem itemValue="3º MÓDULO" itemLabel="3º MÓDULO"/>
+							<f:selectItem itemValue="CONCLUÍDO" itemLabel="CONCLUÍDO"/>
+						</p:selectOneMenu>
+								
+						<p:outputLabel value="Célula:" for="cmbCelulaMembroEditar"/>
+						<p:selectOneMenu value="#{MBMembro.celula.codigoCelula}" filter="true"
+							id="cmbCelulaMembroEditar" required="true" requiredMessage="O campo célula é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione uma célula..."/>
+							<f:selectItems value="#{MBCelula.itens}" var="item" 
+									itemValue="#{item.codigoCelula}" itemLabel="#{item.nome}"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Hierarquia:" for="cmbHierarquiaMembroEditar"/>
+						<p:selectOneMenu value="#{MBMembro.membro.hierarquia.codigoHierarquia}" filter="true"
+							id="cmbHierarquiaMembroEditar" 
+							required="true" requiredMessage="O campo hierarquia é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione uma hierarquia..."/>
+							<f:selectItems value="#{MBMembro.comboHierarquias}" var="item" 
+									itemValue="#{item.codigoHierarquia}" itemLabel="#{item.descricao}"/>
+						</p:selectOneMenu>					
+				</h:panelGrid>
+					<p:commandButton value="Salvar" actionListener="#{MBMembro.editar}" action="#{MBMembro.editarMembroCelula}"
+							oncomplete="verificar(xhr, status, args, 'dlgMembroEditar', 'tabelaMembro');"
+							update=":frmMembroListagem:tblMembro :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgMembroEditar').hide();"/>
+					
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgMembroDetalhes" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Membro - Detalhes">
+				<h:form id="frmMembroDetalhes">
+				<h:panelGrid id="pnlMembroDetalhes" columns="2">
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBMembro.membro.codigoMembro}" />
+					
+					<h:outputLabel value="Nome:" />
+					<h:outputText value="#{MBMembro.membro.nome}" />
+					
+					<h:outputLabel value="Endereço:" />
+					<h:outputText value="#{MBMembro.membro.endereco}" />
+					
+					<h:outputLabel value="Telefone:" />
+					<h:outputText value="#{MBMembro.membro.telefone}" />
+					
+					<h:outputLabel value="Nascimento:" />
+					<h:outputText value="#{MBMembro.membro.dataNascimento}" />
+					
+					<h:outputLabel value="Nº Documento:" />
+					<h:outputText value="#{MBMembro.membro.numeroDocumento}" />
+					
+					<h:outputLabel value="Documento:" />
+					<h:outputText value="#{MBMembro.membro.tipoDocumento}" />
+					
+					<h:outputLabel value="Sexo:" />
+					<h:outputText value="#{MBMembro.membro.sexo}" />
+					
+					<h:outputLabel value="Estado Civil:" />
+					<h:outputText value="#{MBMembro.membro.estadoCivil}" />
+					
+				</h:panelGrid>
+					
+				</h:form>
+		</p:dialog>
+	</ui:define>
+
+</ui:composition>

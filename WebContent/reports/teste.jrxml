@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-02-15T19:20:39 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="teste" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="415b355a-5f97-4f51-8a57-e288611779d9">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SaraWare Data Adapter"/>
+	<queryString>
+		<![CDATA[select t.descricao,  m.titulo FROM tarefa t 
+INNER JOIN item_cronograma ic ON t.item_cronograma_codigo = ic.codigo
+INNER JOIN ministracao m ON ic.ministracao_codigo = m.codigo]]>
+	</queryString>
+	<field name="descricao" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="titulo" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="53" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="560" height="53" uuid="4ac1361e-b160-4e1c-9d6c-d8ee792cfad0"/>
+				<textElement textAlignment="Center">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ESCALA]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="15" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="210" splitType="Stretch">
+			<rectangle radius="10">
+				<reportElement x="0" y="0" width="560" height="210" backcolor="#F2F0F0" uuid="285585b4-5489-482c-9b9c-2def3af291bf"/>
+				<graphicElement>
+					<pen lineStyle="Dashed" lineColor="#000000"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="10" y="30" width="90" height="38" uuid="39dd580a-25d6-40d2-8858-5fad7c5a3026"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Durante a ministração:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="9" width="80" height="19" uuid="27fad359-fc9a-4f7f-a1eb-df1472789e2d"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tarefa:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="9" width="450" height="20" uuid="634b2369-c2bc-4ea5-8c55-282767517cbf"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{titulo}
+]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="30" width="450" height="38" uuid="2c9e47aa-2223-41b9-8413-ca34c9d50398"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descricao}
+]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="10" y="90" width="540" height="19" uuid="4029d6ee-a343-4010-8083-1fbcf8107ad8"/>
+				<subreportParameter name="DESCRICAO">
+					<subreportParameterExpression><![CDATA[$F{descricao}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["escala.jasper"]]></subreportExpression>
+			</subreport>
+			<line>
+				<reportElement x="8" y="73" width="541" height="5" uuid="80ad21fd-f5b6-4391-8529-598f681aa40e"/>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="2" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

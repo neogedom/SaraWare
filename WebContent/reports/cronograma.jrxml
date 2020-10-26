@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-02-19T11:15:27 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cronograma" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6c2d7bf5-ec24-4eca-b606-fe22dac1a32b">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SaraWare Data Adapter"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<queryString>
+		<![CDATA[SELECT saraware.item_cronograma.dia,
+	saraware.item_cronograma.hora_inicio,
+	saraware.ministracao.titulo
+FROM saraware.item_cronograma
+	INNER JOIN saraware.ministracao ON 
+	 saraware.item_cronograma.ministracao_codigo = saraware.ministracao.codigo 
+UNION 
+SELECT saraware.item_cronograma.dia,
+	saraware.item_cronograma.hora_inicio,
+	saraware.intervalo.descricao
+FROM saraware.item_cronograma
+	INNER JOIN saraware.intervalo ON 
+	 saraware.item_cronograma.intervalo_codigo = saraware.intervalo.codigo]]>
+	</queryString>
+	<field name="dia" class="java.lang.String"/>
+	<field name="hora_inicio" class="java.sql.Time"/>
+	<field name="titulo" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="560" height="61" uuid="dbed2298-adc0-4caa-8f27-b5a3f678dd1b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CRONOGRAMA]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="85" splitType="Stretch">
+			<textField>
+				<reportElement x="-11" y="0" width="575" height="41" uuid="bfb70b69-eadb-4e0d-bbbb-a7bbe4dd1936"/>
+				<textElement textAlignment="Center">
+					<font size="20"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dia}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="-9" y="42" width="571" height="43" uuid="7139758a-5b97-49af-94ed-295a0898c3d1"/>
+				<subreportParameter name="DIA">
+					<subreportParameterExpression><![CDATA[$F{dia}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["diaUm.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

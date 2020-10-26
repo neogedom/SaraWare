@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/modeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmHierarquiaListagem">
+			<p:dataTable id="tblHierarquia" widgetVar="tabelaHierarquia"
+				emptyMessage="Nenhum registro encontrado."
+				value="#{MBHierarquia.itens}" var="item"
+				filteredValue="#{MBHierarquia.itensFiltrados}"
+				paginator="true" rows="10">
+				
+				<f:facet name="header">
+					Hierarquia - Listagem
+				</f:facet>
+				
+				<p:column headerText="Código" sortBy="#{item.codigoHierarquia}"
+					filterBy="#{item.codigoHierarquia}" filterMatchMode="contains">
+					<h:outputText value="#{item.codigoHierarquia}" />
+				</p:column>
+				<p:column headerText="Descrição" sortBy="#{item.descricao}"
+					filterBy="#{item.descricao}" filterMatchMode="contains">
+					<h:outputText value="#{item.descricao}" />
+				</p:column>
+				
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-trash" 
+										oncomplete="PF('dlgHierarquiaExcluir').show();"
+										update=":frmHierarquiaExcluir:pnlHierarquiaExcluir">
+											<f:setPropertyActionListener target="#{MBHierarquia.hierarquia}" value="#{item}" />
+										</p:commandButton>
+
+										
+										<p:commandButton icon="ui-icon-pencil"  
+										oncomplete="PF('dlgHierarquiaEditar').show();"
+										update=":frmHierarquiaEditar:pnlHierarquiaEditar" >
+											<f:setPropertyActionListener target="#{MBHierarquia.hierarquia}" value="#{item}" />
+										</p:commandButton>
+				</p:column>
+								
+				<f:facet name="footer">
+					<p:commandButton value="Novo" actionListener="#{MBHierarquia.prepararNovo}" 
+									oncomplete="PF('dlgHierarquiaNovo').show();"
+									update=":frmHierarquiaNovo:pnlHierarquiaNovo" />
+				</f:facet>
+				
+			</p:dataTable>
+			
+			
+		</h:form>
+		
+		<p:dialog widgetVar="dlgHierarquiaNovo" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Hierarquia - Novo" >
+				<h:form id="frmHierarquiaNovo">
+					<h:panelGrid id="pnlHierarquiaNovo" columns="2">
+						<p:outputLabel value="Descrição" for="txtDescHierarquiaNovo"/>
+						<p:inputText id="txtDescHierarquiaNovo"
+						 size="30" maxlength="45" 
+						value="#{MBHierarquia.hierarquia.descricao}" 
+						required="true" requiredMessage="O campo descrição é obrigatório."
+						validatorMessage="Este campo aceita apenas letras e espaços.">
+							<f:validateRegex pattern="[a-zA-Z ]*" />
+						</p:inputText>
+					</h:panelGrid>
+					<h:panelGrid columns="2">
+						<p:commandButton value="Salvar" actionListener="#{MBHierarquia.novo}"
+							oncomplete="verificar(xhr, status, args, 'dlgHierarquiaNovo', 'tabelaHierarquia');"
+							update=":frmHierarquiaListagem:tblHierarquia :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgHierarquiaNovo').hide();"/>
+					</h:panelGrid>
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgHierarquiaExcluir" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Hierarquia - Excluir">
+				<h:form id="frmHierarquiaExcluir">
+				<h:panelGrid id="pnlHierarquiaExcluir" columns="2">
+					<h:outputText value="Código:" />
+					<h:outputText value="#{MBHierarquia.hierarquia.codigoHierarquia}" />
+					
+					<h:outputText value="Descrição:" />
+					<h:outputText value="#{MBHierarquia.hierarquia.descricao}" />
+				</h:panelGrid>
+					<p:commandButton value="Excluir" actionListener="#{MBHierarquia.excluir}"
+							oncomplete="PF('dlgHierarquiaExcluir').hide(); tabelaHierarquia.clearFilters();"
+							update=":frmHierarquiaListagem:tblHierarquia :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgHierarquiaExcluir').hide();"/>
+					
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgHierarquiaEditar" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Hierarquia - Editar">
+				<h:form id="frmHierarquiaEditar">
+				<h:panelGrid id="pnlHierarquiaEditar" columns="2">
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBHierarquia.hierarquia.codigoHierarquia}" />
+					
+					<h:outputLabel for="txtDescHierarquiaEditar" value="Descrição:" />
+					<h:inputText id="txtDescHierarquiaEditar" 
+							value="#{MBHierarquia.hierarquia.descricao}" 
+							required="true" requiredMessage="O campo descrição é obrigatório."
+							size="30" maxlength="45" validatorMessage="Este campo aceita apenas letras e espaços.">
+								<f:validateRegex pattern="[a-zA-Z ]*" />
+							</h:inputText>
+				</h:panelGrid>
+					<p:commandButton value="Salvar" actionListener="#{MBHierarquia.editar}"
+							oncomplete="verificar(xhr, status, args, 'dlgHierarquiaEditar', 'tabelaHierarquia');"
+							update=":frmHierarquiaListagem:tblHierarquia :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgHierarquiaEditar').hide();"/>
+					
+				</h:form>
+		</p:dialog>
+	</ui:define>
+
+</ui:composition>

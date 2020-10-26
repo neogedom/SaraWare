@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
+<!-- 2016-02-13T16:19:38 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="diaUm" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bb627bf5-e06f-4346-8275-08d3db778daf">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="DIA" class="java.lang.String">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+		<defaultValueExpression><![CDATA["Dia 1"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT saraware.item_cronograma.dia,
+	saraware.item_cronograma.hora_inicio,
+	saraware.ministracao.titulo
+FROM saraware.item_cronograma
+	INNER JOIN saraware.ministracao ON 
+	 saraware.item_cronograma.ministracao_codigo = saraware.ministracao.codigo 
+WHERE 
+	   saraware.item_cronograma.dia = $P{DIA}
+UNION 
+SELECT saraware.item_cronograma.dia,
+	saraware.item_cronograma.hora_inicio,
+	saraware.intervalo.descricao
+FROM saraware.item_cronograma
+	INNER JOIN saraware.intervalo ON 
+	 saraware.item_cronograma.intervalo_codigo = saraware.intervalo.codigo
+	 WHERE 
+	   saraware.item_cronograma.dia = $P{DIA}]]>
+	</queryString>
+	<field name="dia" class="java.lang.String"/>
+	<field name="hora_inicio" class="java.sql.Time"/>
+	<field name="titulo" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="38" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="90" height="30" uuid="cdb99c62-e020-42fe-b4d9-168f88c5cac9"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[HORA]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="120" height="30" uuid="ac00d23c-8282-4548-ab2c-7afe06fa701f"/>
+				<textElement>
+					<font size="13"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("HH:mm").format($F{hora_inicio})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="0" width="420" height="30" uuid="dbbbefe6-ca22-4b06-88c8-3ff40fe26745"/>
+				<textElement>
+					<font size="13"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{titulo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

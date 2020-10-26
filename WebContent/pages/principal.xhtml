@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/modeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml"></ui:include>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<p:layout>
+			<p:layoutUnit position="west">
+				<h:form id="frmPrincipal">
+					<p:panelGrid columns="1" id="pnlPrincipal"
+						style="font-size:25px;font-weight: bolder;">
+						<p:outputLabel id="txtPlanejamento" escape="false"
+							value=" #{MBPlanejamento.msg}" styleClass="txtPagInicial" />
+
+						<p:commandButton value="Iniciar Planejamento"
+							actionListener="#{MBPlanejamento.prepararNovo}"
+							oncomplete="PF('dlgPlanejamento').show();" />
+							
+					</p:panelGrid>
+					<h:outputLabel value="Valor em caixa: #{MBCaixa.valorEmCaixa}"/>
+				</h:form>
+				<h:form id="frmPrincipalRevisao">
+					<p:panelGrid columns="1" styleClass="afastadoComponente">
+
+						<p:outputLabel styleClass="txtPagInicial" value="Revisão de Vidas"/>
+						<p:commandButton value="Iniciar Revisão de Vidas"
+							rendered="#{MBPlanejamento.botaoVisivel}" ajax="false"
+							icon="ui-icon-flag"
+							actionListener="#{MBPlanejamento.prepararLabel}"
+							action="/pages/revisao.xhtml?faces-redirect=true" />
+
+							<p:commandButton value="Criar Metas para Células"
+								rendered="#{MBPlanejamento.botaoVisivel}" ajax="false"
+								icon="ui-icon-flag" action="/pages/meta.xhtml?faces-redirect=true" />
+					</p:panelGrid>
+
+				</h:form>
+			</p:layoutUnit>
+			<p:layoutUnit position="center">
+				<p:graphicImage url="/images/sara.png" width="541"
+					styleClass="centralizado" height="383"
+					style="horizontal-align:center;" />
+			</p:layoutUnit>
+		</p:layout>
+
+		<p:dialog widgetVar="dlgPlanejamento" closable="true" draggable="true"
+			resizable="false" modal="true" appendTo="@(body)" height="90%"
+			header="Planejamento">
+
+			<h:form id="frmPlanejamento">
+				<h:panelGrid columns="8" id="pnlPlanejamento">
+					<p:outputLabel value="Primeira Data:" for="cldPrimTrimestre" />
+					<p:calendar id="cldPrimTrimestre"
+						value="#{MBPlanejamento.revisao1.dataDeAcontecimento}"
+						required="true" mode="inline"
+						requiredMessage="O campo revisão no 1º trimestre é obrigatório."
+						readonlyInput="true" pattern="dd/MM/yyyy"
+						mindate="#{MBPlanejamento.dataAtual}"
+						maxdate="#{MBPlanejamento.dataFinal}" navigator="true" />
+
+					<p:outputLabel value="Segunda Data:" for="cldSegTrimestre" />
+					<p:calendar id="cldSegTrimestre"
+						value="#{MBPlanejamento.revisao2.dataDeAcontecimento}"
+						required="true" mode="inline"
+						requiredMessage="O campo revisão no 2º trimestre é obrigatório."
+						readonlyInput="true" pattern="dd/MM/yyyy"
+						mindate="#{MBPlanejamento.dataAtual}"
+						maxdate="#{MBPlanejamento.dataFinal}" navigator="true" />
+
+					<p:outputLabel value="Terceira Data:" for="cldTercTrimestre" />
+					<p:calendar id="cldTercTrimestre"
+						value="#{MBPlanejamento.revisao3.dataDeAcontecimento}"
+						required="true" mode="inline"
+						requiredMessage="O campo revisão no 3º trimestre é obrigatório."
+						readonlyInput="true" pattern="dd/MM/yyyy"
+						mindate="#{MBPlanejamento.dataAtual}" yearRange="c-100:c+0"
+						maxdate="#{MBPlanejamento.dataFinal}" navigator="true" />
+
+					<p:outputLabel value="Quarta Data:" for="cldQuartoTrimestre" />
+					<p:calendar id="cldQuartoTrimestre"
+						value="#{MBPlanejamento.revisao4.dataDeAcontecimento}"
+						required="true" mode="inline"
+						requiredMessage="O campo revisão no 4º trimestre é obrigatório."
+						readonlyInput="true" pattern="dd/MM/yyyy"
+						mindate="#{MBPlanejamento.dataAtual}"
+						maxdate="#{MBPlanejamento.dataFinal}" navigator="true" />
+
+				</h:panelGrid>
+
+				<p:commandButton value="Gravar Planejamento"
+					actionListener="#{MBPlanejamento.novo}"
+					oncomplete=":frmPrincipal:pnlPrincipal" />
+
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+
+	<ui:define name="rodape">
+	</ui:define>
+</ui:composition>

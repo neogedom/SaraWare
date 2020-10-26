@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<h:form>
+		<p:menubar>
+			<p:submenu label="Arquivo">
+				<p:menuitem value="Principal" outcome="/pages/principal.xhtml" />
+				<p:separator />
+				<p:menuitem value="Sair" action="#{MBAutenticacao.sair}"/>
+			</p:submenu>
+			
+			<p:submenu label="Cadastros">
+				<p:menuitem value="Membro" outcome="/pages/membro.xhtml"/>
+				<p:menuitem value="Hierarquia" outcome="/pages/hierarquia.xhtml"/>
+				<p:menuitem value="Célula" outcome="/pages/celula.xhtml"/>
+				<p:menuitem value="Compras/Doações" outcome="/pages/recursos.xhtml"/>
+				
+			</p:submenu>
+			
+			<p:submenu label="Encontristas">
+				<p:submenu label="Pré-inscrição">
+					<p:menuitem value="Novos" outcome="/pages/encontrista.xhtml"/>
+					<p:menuitem value="Reincidentes" outcome="/pages/encontristaReincidente.xhtml"/>
+				</p:submenu>
+
+			</p:submenu>
+			
+
+			<p:submenu label="Ajuda">
+				<p:menuitem value="Sobre"/>
+			</p:submenu>
+		</p:menubar>
+	</h:form>
+</ui:composition>

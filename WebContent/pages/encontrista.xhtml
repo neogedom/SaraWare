@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/modeloSistema.xhtml">
+
+	<ui:define name="menu">
+		<ui:include src="/includes/menuPrincipal.xhtml" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmEncontristaListagem">
+			<p:dataTable id="tblEncontrista" widgetVar="tabelaEncontrista"
+				emptyMessage="Nenhum registro encontrado."
+				value="#{MBEncontrista.itens}" var="item"
+				filteredValue="#{MBEncontrista.itensFiltrados}"
+				paginator="true" rows="10">
+				
+				<f:facet name="header">
+					Pré Inscrição de Não Membros - Listagem
+				</f:facet>
+				
+				<p:column headerText="Código" sortBy="#{item.codigoEncontrista}"
+					filterBy="#{item.codigoEncontrista}" filterMatchMode="contains">
+					<h:outputText value="#{item.codigoEncontrista}" />
+				</p:column>
+				
+				<p:column headerText="Nome" sortBy="#{item.nome}"
+					filterBy="#{item.nome}" filterMatchMode="contains">
+					<h:outputText value="#{item.nome}" />
+				</p:column>
+				
+				
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-plusthick" 
+										oncomplete="PF('dlgEncontristaDetalhes').show();"
+										update=":frmEncontristaDetalhes:pnlEncontristaDetalhes" alt="Mais Detalhes">
+											<f:setPropertyActionListener target="#{MBEncontrista.encontrista}" value="#{item}" />
+										</p:commandButton>
+										
+					<p:commandButton icon="ui-icon-trash" 
+										oncomplete="PF('dlgEncontristaExcluir').show();"
+										update=":frmEncontristaExcluir:pnlEncontristaExcluir" alt="Excluir">
+											<f:setPropertyActionListener target="#{MBEncontrista.encontrista}" value="#{item}" />
+										</p:commandButton>
+
+										
+					<p:commandButton icon="ui-icon-pencil"  
+										oncomplete="PF('dlgEncontristaEditar').show();"
+										update=":frmEncontristaEditar:pnlEncontristaEditar" 
+										alt="Editar">
+											<f:setPropertyActionListener target="#{MBEncontrista.encontrista}" value="#{item}" />
+										</p:commandButton>
+				</p:column>
+								
+				<f:facet name="footer">
+					<p:commandButton value="Novo" actionListener="#{MBEncontrista.prepararNovo}" 
+									oncomplete="PF('dlgEncontristaNovo').show();"
+									update=":frmEncontristaNovo:pnlEncontristaNovo :msgGlobal" />
+				</f:facet>
+				
+			</p:dataTable>
+		</h:form>
+		
+		<p:dialog widgetVar="dlgEncontristaNovo" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Encontrista - Novo" >
+				<h:form id="frmEncontristaNovo">
+					
+					<h:panelGrid id="pnlEncontristaNovo" columns="2">
+						
+						<p:outputLabel value="Nome:" for="txtNomeEncontristaNovo" />
+						<p:inputText size="30" maxlength="45" value="#{MBEncontrista.encontrista.nome}" 
+							id="txtNomeEncontristaNovo"
+							required="true" requiredMessage="O campo valor é obrigatório."/>
+						
+						<p:outputLabel value="Endereço:" for="txtEnderecoEncontristaNovo" />
+						<p:inputText size="30" maxlength="45" value="#{MBEncontrista.encontrista.endereco}" 
+							id="txtEnderecoEncontristaNovo"
+							required="true" requiredMessage="O campo endereço é obrigatório."/>
+						
+						<p:outputLabel value="Telefone:" for="txtTelefoneEncontristaNovo" />
+						<p:inputText size="30" maxlength="15" value="#{MBEncontrista.encontrista.telefone}" 
+							id="txtTelefoneEncontristaNovo"
+							required="true" requiredMessage="O campo telefone é obrigatório."/>
+						
+						<p:outputLabel value="Nascimento:" for="txtNascimentoEncontristaNovo" />
+						<p:calendar id="txtNascimentoEncontristaNovo" value="#{MBEncontrista.encontrista.dataNascimento}" 
+							required="true" requiredMessage="O campo data de nascimento é obrigatório." 
+							readonlyInput="true" yearRange="c-100:c+0" pattern="dd/MM/yyyy" mindate="01/01/1900" maxdate="#{MBData.maxDate}"
+							navigator="true"/>
+						
+						<p:outputLabel value="Nº Documento:" for="txtNumeroDocumentoEncontristaNovo" />
+						<p:inputText size="30" maxlength="45" value="#{MBEncontrista.encontrista.numeroDocumento}" 
+							id="txtNumeroDocumentoEncontristaNovo"
+							required="true" requiredMessage="O campo número de documento é obrigatório."/>
+						
+						<p:outputLabel value="Tipo de Documento:" for="cmbTipoDocumentoEncontristaNovo"/>
+						<p:selectOneMenu value="#{MBEncontrista.encontrista.tipoDocumento}" filter="true"
+							id="cmbTipoDocumentoEncontristaNovo" 
+							required="true" requiredMessage="O campo tipo de documento é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um tipo de documento..."/>
+							<f:selectItem itemValue="CPF" itemLabel="CPF"/>
+							<f:selectItem itemValue="RG" itemLabel="RG"/>
+							<f:selectItem itemValue="CNH" itemLabel="CNH"/>
+							<f:selectItem itemValue="Certidão de Nascimento" itemLabel="Certidão de Nascimento"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Sexo:" for="cmbSexoEncontristaNovo" />
+						<p:selectOneMenu value="#{MBEncontrista.encontrista.sexo}" filter="true"
+							id="cmbSexoEncontristaNovo" 
+							required="true" requiredMessage="O campo sexo é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um sexo..."/>
+							<f:selectItem itemValue="CPF" itemLabel="MASCULINO"/>
+							<f:selectItem itemValue="RG" itemLabel="FEMININO"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Estado Civil:" for="cmbEstadoCivilEncontristaNovo" />
+						<p:selectOneMenu value="#{MBEncontrista.encontrista.estadoCivil}" filter="true"
+							id="cmbEstadoCivilEncontristaNovo" 
+							required="true" requiredMessage="O campo estado civil é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um estado civil..."/>
+							<f:selectItem itemValue="SOLTEIRO(A)" itemLabel="SOLTEIRO(A)"/>
+							<f:selectItem itemValue="CASADO(A)" itemLabel="CASADO(A)"/>
+						</p:selectOneMenu>
+						
+					</h:panelGrid>
+					
+					<h:panelGrid columns="2">
+						<p:commandButton value="Salvar" actionListener="#{MBEncontrista.novo}"
+							oncomplete="verificar(xhr, status, args, 'dlgEncontristaNovo', 'tabelaEncontrista');"
+							update=":frmEncontristaListagem:tblEncontrista :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgEncontristaNovo').hide();"/>
+					</h:panelGrid>
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgEncontristaExcluir" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Encontrista - Excluir">
+				<h:form id="frmEncontristaExcluir">
+				<h:panelGrid id="pnlEncontristaExcluir" columns="2">
+					<h:outputText value="Código:" />
+					<h:outputText value="#{MBEncontrista.encontrista.codigoEncontrista}" />
+					<h:outputText value="Nome:" />
+					<h:outputText value="#{MBEncontrista.encontrista.nome}" />
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir" actionListener="#{MBEncontrista.excluir}"
+							oncomplete="PF('dlgEncontristaExcluir').hide(); tabelaEncontrista.clearFilters();"
+							update=":frmEncontristaListagem:tblEncontrista :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgEncontristaExcluir').hide();"/>
+				</h:panelGrid>
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgEncontristaEditar" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Encontrista - Editar">
+				
+				<h:form id="frmEncontristaEditar">
+				<h:panelGrid id="pnlEncontristaEditar" columns="2">
+					
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBEncontrista.encontrista.codigoEncontrista}" />
+					
+					<p:outputLabel value="Nome:" for="txtNomeEncontristaEditar" />
+						<p:inputText size="30" maxlength="45" value="#{MBEncontrista.encontrista.nome}" 
+							id="txtNomeEncontristaEditar"
+							required="true" requiredMessage="O campo nome é obrigatório."/>
+						
+					<p:outputLabel value="Endereço:" for="txtEnderecoEncontristaEditar" />
+						<p:inputText size="30" maxlength="45" value="#{MBEncontrista.encontrista.endereco}" 
+							id="txtEnderecoEncontristaEditar"
+							required="true" requiredMessage="O campo endereço é obrigatório."/>
+						
+						<p:outputLabel value="Telefone:" for="txtTelefoneEncontristaEditar" />
+						<p:inputText size="30" maxlength="15" value="#{MBEncontrista.encontrista.telefone}" 
+							id="txtTelefoneEncontristaEditar"
+							required="true" requiredMessage="O campo telefone é obrigatório."/>
+						
+						<p:outputLabel value="Nascimento:" for="txtNascimentoEncontristaEditar" />
+						<p:calendar id="txtNascimentoEncontristaEditar" value="#{MBEncontrista.encontrista.dataNascimento}" 
+							required="true" requiredMessage="O campo data de nascimento é obrigatório." 
+							readonlyInput="true" yearRange="c-100:c+0" pattern="dd/MM/yyyy" mindate="01/01/1900"
+							navigator="true"/>
+						
+						<p:outputLabel value="Nº Documento:" for="txtNumeroDocumentoEncontristaEditar" />
+						<p:inputText size="30" maxlength="45" value="#{MBEncontrista.encontrista.numeroDocumento}" 
+							id="txtNumeroDocumentoEncontristaEditar"
+							required="true" requiredMessage="O campo número de documento é obrigatório."/>
+						
+						<p:outputLabel value="Tipo de Documento:" for="cmbTipoDocumentoEncontristaEditar"/>
+						<p:selectOneMenu value="#{MBEncontrista.encontrista.tipoDocumento}" filter="true"
+							id="cmbTipoDocumentoEncontristaEditar" 
+							required="true" requiredMessage="O campo tipo de documento é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um tipo de documento..."/>
+							<f:selectItem itemValue="CPF" itemLabel="CPF"/>
+							<f:selectItem itemValue="RG" itemLabel="RG"/>
+							<f:selectItem itemValue="CNH" itemLabel="CNH"/>
+							<f:selectItem itemValue="Certidão de Nascimento" itemLabel="Certidão de Nascimento"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Sexo:" for="cmbSexoEncontristaEditar" />
+						<p:selectOneMenu value="#{MBEncontrista.encontrista.sexo}" filter="true"
+							id="cmbSexoEncontristaEditar" 
+							required="true" requiredMessage="O campo sexo é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um sexo..."/>
+							<f:selectItem itemValue="CPF" itemLabel="MASCULINO"/>
+							<f:selectItem itemValue="RG" itemLabel="FEMININO"/>
+						</p:selectOneMenu>
+						
+						<p:outputLabel value="Estado Civil:" for="cmbEstadoCivilEncontristaEditar" />
+						<p:selectOneMenu value="#{MBEncontrista.encontrista.estadoCivil}" filter="true"
+							id="cmbEstadoCivilEncontristaEditar" 
+							required="true" requiredMessage="O campo estado civil é obrigatório.">
+							<f:selectItem itemValue="" itemLabel="Selecione um estado civil..."/>
+							<f:selectItem itemValue="SOLTEIRO(A)" itemLabel="SOLTEIRO(A)"/>
+							<f:selectItem itemValue="CASADO(A)" itemLabel="CASADO(A)"/>
+						</p:selectOneMenu>
+										
+				</h:panelGrid>
+					<p:commandButton value="Salvar" actionListener="#{MBEncontrista.editar}"
+							oncomplete="verificar(xhr, status, args, 'dlgEncontristaEditar', 'tabelaEncontrista');"
+							update=":frmEncontristaListagem:tblEncontrista :msgGlobal"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgEncontristaEditar').hide();"/>
+					
+				</h:form>
+		</p:dialog>
+		
+		<p:dialog widgetVar="dlgEncontristaDetalhes" closable="true"
+				draggable="true" resizable="false"
+				modal="true" appendTo="@(body)"
+				header="Encontrista - Detalhes">
+				<h:form id="frmEncontristaDetalhes">
+				<h:panelGrid id="pnlEncontristaDetalhes" columns="2">
+					<h:outputLabel value="Código:" />
+					<h:outputText value="#{MBEncontrista.encontrista.codigoEncontrista}" />
+					
+					<h:outputLabel value="Nome:" />
+					<h:outputText value="#{MBEncontrista.encontrista.nome}" />
+					
+					<h:outputLabel value="Endereço:" />
+					<h:outputText value="#{MBEncontrista.encontrista.endereco}" />
+					
+					<h:outputLabel value="Telefone:" />
+					<h:outputText value="#{MBEncontrista.encontrista.telefone}" />
+					
+					<h:outputLabel value="Nascimento:" />
+					<h:outputText value="#{MBEncontrista.encontrista.dataNascimento}" />
+					
+					<h:outputLabel value="Nº Documento:" />
+					<h:outputText value="#{MBEncontrista.encontrista.numeroDocumento}" />
+					
+					<h:outputLabel value="Documento:" />
+					<h:outputText value="#{MBEncontrista.encontrista.tipoDocumento}" />
+					
+					<h:outputLabel value="Sexo:" />
+					<h:outputText value="#{MBEncontrista.encontrista.sexo}" />
+					
+					<h:outputLabel value="Estado Civil:" />
+					<h:outputText value="#{MBEncontrista.encontrista.estadoCivil}" />
+					
+				</h:panelGrid>
+					
+				</h:form>
+		</p:dialog>
+	</ui:define>
+
+</ui:composition>
